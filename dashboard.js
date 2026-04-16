@@ -229,18 +229,19 @@
 
     container.innerHTML = userPrograms.map(up => {
       const p = up.programs || {};
-      const totalWeeks = p.duration_weeks || 12;
+      const totalWeeks  = p.duration_weeks || 12;
       const currentWeek = up.current_week || 1;
-      const progress = Math.min(100, Math.round((currentWeek / totalWeeks) * 100));
-      const color = PROGRAM_COLORS[p.category] || '#F97316';
-      const startDate = new Date(up.started_at).toLocaleDateString(undefined, { month:'short', day:'numeric' });
+      const progress    = Math.min(100, Math.round((currentWeek / totalWeeks) * 100));
+      const color       = PROGRAM_COLORS[p.category] || '#F97316';
+      const startDate   = new Date(up.started_at).toLocaleDateString(undefined, { month:'short', day:'numeric' });
+      const safeName    = escHtml(p.name || 'Program');
 
       return `
         <div class="db-card program-active-card" style="border-left: 3px solid ${color}">
           <div class="pac-header">
             <div>
-              <div class="pac-tag" style="color:${color}">${escHtml(p.category || 'program').replace('_',' ')}</div>
-              <h3 class="pac-name">${escHtml(p.name || 'Program')}</h3>
+              <div class="pac-tag" style="color:${color}">${escHtml((p.category || 'program').replace('_',' '))}</div>
+              <h3 class="pac-name">${safeName}</h3>
             </div>
             <span class="pac-status ${up.status}">${up.status}</span>
           </div>
@@ -254,6 +255,7 @@
           <div class="pac-meta">
             ${p.sessions_per_week ? `<span>${p.sessions_per_week}x / week</span>` : ''}
             <span>Started ${startDate}</span>
+            <button class="pac-btn-schedule" onclick="window.openProgramDetail('${escHtml(p.name || '')}')">View Schedule</button>
             ${up.status === 'active' ? `<button class="pac-btn-complete" data-program-user-id="${up.id}" onclick="window.completeWeek('${up.id}')">Complete Week ${currentWeek}</button>` : ''}
           </div>
         </div>`;
@@ -961,5 +963,433 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   }
+
+  // ── Program Detail Modal ──────────────────────────
+
+  // Static guest preview data matching seed in schema-programs-v2.sql
+  const PROGRAM_DETAIL_DATA = {
+    'Power Foundation': {
+      category: 'strength', level: 'All Levels', duration_weeks: 12, sessions_per_week: 4,
+      color: '#F97316',
+      sessions: [
+        { day_number: 1, name: 'Lower Body Strength', focus: 'legs', estimated_duration_minutes: 65, estimated_calories: 430, notes: 'Focus on depth and bracing. Add 2.5 kg/week.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Warm-up Squat',       equipment:'Barbell',   sets:3, reps:'5 @50%',  rest_seconds:60,  calories_per_set:6,  notes:'Light weight, perfect form' },
+            { order_index:2, exercise_name:'Back Squat',          equipment:'Barbell',   sets:4, reps:'5 @80%',  rest_seconds:180, calories_per_set:14, notes:'3-sec descent, drive through heels' },
+            { order_index:3, exercise_name:'Romanian Deadlift',   equipment:'Barbell',   sets:3, reps:'8',       rest_seconds:120, calories_per_set:10, notes:'Hinge at hips, slight knee bend' },
+            { order_index:4, exercise_name:'Leg Press',           equipment:'Machine',   sets:3, reps:'10',      rest_seconds:90,  calories_per_set:8,  notes:'Full range of motion' },
+            { order_index:5, exercise_name:'Walking Lunge',       equipment:'Dumbbells', sets:3, reps:'12 each', rest_seconds:75,  calories_per_set:9,  notes:'Keep torso upright' },
+            { order_index:6, exercise_name:'Standing Calf Raise', equipment:'Machine',   sets:4, reps:'15',      rest_seconds:60,  calories_per_set:4,  notes:'Pause at top' }
+          ]
+        },
+        { day_number: 2, name: 'Upper Body Push', focus: 'push', estimated_duration_minutes: 60, estimated_calories: 390, notes: 'Shoulder warm-up essential before heavy pressing.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Bench Press',            equipment:'Barbell',       sets:4, reps:'5 @80%', rest_seconds:180, calories_per_set:12, notes:'Retract scapula, controlled descent' },
+            { order_index:2, exercise_name:'Overhead Press',         equipment:'Barbell',       sets:3, reps:'8',      rest_seconds:120, calories_per_set:10, notes:'Brace core, full lockout' },
+            { order_index:3, exercise_name:'Incline Dumbbell Press', equipment:'Dumbbells',     sets:3, reps:'10',     rest_seconds:90,  calories_per_set:8,  notes:'30–45° incline' },
+            { order_index:4, exercise_name:'Cable Fly',              equipment:'Cable Machine', sets:3, reps:'12',     rest_seconds:60,  calories_per_set:6,  notes:'Full stretch at bottom' },
+            { order_index:5, exercise_name:'Tricep Pushdown',        equipment:'Cable Machine', sets:3, reps:'12',     rest_seconds:60,  calories_per_set:5,  notes:'Elbows fixed, squeeze at bottom' },
+            { order_index:6, exercise_name:'Lateral Raise',          equipment:'Dumbbells',     sets:3, reps:'15',     rest_seconds:45,  calories_per_set:4,  notes:'Slight forward lean' }
+          ]
+        },
+        { day_number: 4, name: 'Upper Body Pull & Deadlift', focus: 'pull', estimated_duration_minutes: 70, estimated_calories: 470, notes: 'Heaviest day. Full neural recovery needed.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Deadlift',         equipment:'Barbell',       sets:4, reps:'5 @85%',   rest_seconds:180, calories_per_set:18, notes:'Brace and pull from hips' },
+            { order_index:2, exercise_name:'Barbell Row',      equipment:'Barbell',       sets:4, reps:'8',        rest_seconds:120, calories_per_set:12, notes:'Pull to lower chest' },
+            { order_index:3, exercise_name:'Pull-Up',          equipment:'Pull-up Bar',   sets:3, reps:'Max reps', rest_seconds:90,  calories_per_set:10, notes:'Full hang to chin over bar' },
+            { order_index:4, exercise_name:'Seated Cable Row', equipment:'Cable Machine', sets:3, reps:'12',       rest_seconds:75,  calories_per_set:7,  notes:'Squeeze shoulder blades' },
+            { order_index:5, exercise_name:'Face Pull',        equipment:'Cable Machine', sets:3, reps:'15',       rest_seconds:60,  calories_per_set:5,  notes:'Protects shoulder health' },
+            { order_index:6, exercise_name:'Barbell Curl',     equipment:'Barbell',       sets:3, reps:'10',       rest_seconds:60,  calories_per_set:6,  notes:'No swinging' }
+          ]
+        },
+        { day_number: 5, name: 'Full Body Accessory', focus: 'full_body', estimated_duration_minutes: 55, estimated_calories: 350, notes: 'Address weak points, build work capacity.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Front Squat',       equipment:'Barbell',   sets:3, reps:'5 @70%',  rest_seconds:120, calories_per_set:10, notes:'Builds quad strength for back squat' },
+            { order_index:2, exercise_name:'DB Shoulder Press', equipment:'Dumbbells', sets:3, reps:'10',      rest_seconds:90,  calories_per_set:8,  notes:'Seated, controlled' },
+            { order_index:3, exercise_name:'Dumbbell Row',      equipment:'Dumbbells', sets:3, reps:'12 each', rest_seconds:75,  calories_per_set:7,  notes:'Neutral spine' },
+            { order_index:4, exercise_name:'Leg Curl',          equipment:'Machine',   sets:3, reps:'12',      rest_seconds:60,  calories_per_set:6,  notes:'Full range' },
+            { order_index:5, exercise_name:'Ab Wheel Rollout',  equipment:'Ab Wheel',  sets:3, reps:'10',      rest_seconds:60,  calories_per_set:6,  notes:'Brace core throughout' },
+            { order_index:6, exercise_name:'Farmer Walk',       equipment:'Dumbbells', sets:3, reps:'30m',     rest_seconds:60,  calories_per_set:8,  notes:'Maximize grip strength' }
+          ]
+        }
+      ]
+    },
+    'Endurance Engine': {
+      category: 'cardio', level: 'Beginner', duration_weeks: 8, sessions_per_week: 5,
+      color: '#22C55E',
+      sessions: [
+        { day_number: 1, name: 'HIIT Sprint Session', focus: 'hiit', estimated_duration_minutes: 35, estimated_calories: 380, notes: 'Warm up 5 min before starting intervals.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Jog Warm-Up',      equipment:'Treadmill / Outdoor', sets:1, reps:'5 min',                   rest_seconds:0,  calories_per_set:40, notes:'Easy pace, Zone 1' },
+            { order_index:2, exercise_name:'Sprint Intervals', equipment:'Treadmill / Outdoor', sets:10,reps:'30 sec on / 30 sec off',  rest_seconds:0,  calories_per_set:20, notes:'90% max effort sprints' },
+            { order_index:3, exercise_name:'Jog Cool-Down',    equipment:'Treadmill / Outdoor', sets:1, reps:'5 min',                   rest_seconds:0,  calories_per_set:40, notes:'Zone 1, lower HR' }
+          ]
+        },
+        { day_number: 2, name: 'Steady State Run', focus: 'cardio', estimated_duration_minutes: 35, estimated_calories: 320, notes: 'Conversational pace throughout. Stay in Zone 2.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Easy Run Zone 2', equipment:'Treadmill / Outdoor', sets:1, reps:'30 min', rest_seconds:0, calories_per_set:280, notes:'Conversational pace, 65–75% max HR' },
+            { order_index:2, exercise_name:'Stretching',      equipment:'No Equipment',        sets:1, reps:'5 min',  rest_seconds:0, calories_per_set:0,   notes:'Focus on hip flexors and calves' }
+          ]
+        },
+        { day_number: 3, name: 'Threshold Intervals', focus: 'hiit', estimated_duration_minutes: 45, estimated_calories: 460, notes: 'Hard but sustainable effort. Should not be gasping.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Warm-Up Jog',   equipment:'Treadmill / Outdoor', sets:1, reps:'5 min',       rest_seconds:0,   calories_per_set:40, notes:'Easy pace' },
+            { order_index:2, exercise_name:'Threshold Run', equipment:'Treadmill / Outdoor', sets:5, reps:'3 min @85%',  rest_seconds:120, calories_per_set:64, notes:'85% max HR, 2 min rest between reps' },
+            { order_index:3, exercise_name:'Cool-Down Jog', equipment:'Treadmill / Outdoor', sets:1, reps:'5 min',       rest_seconds:0,   calories_per_set:40, notes:'Easy pace' }
+          ]
+        },
+        { day_number: 4, name: 'Active Recovery', focus: 'mobility', estimated_duration_minutes: 30, estimated_calories: 150, notes: 'Low intensity only. Let body recover.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Easy Walk',    equipment:'Outdoor',     sets:1, reps:'20 min', rest_seconds:0, calories_per_set:110, notes:'Flat ground, easy pace' },
+            { order_index:2, exercise_name:'Foam Rolling', equipment:'Foam Roller', sets:1, reps:'10 min', rest_seconds:0, calories_per_set:0,   notes:'Quads, hamstrings, IT band, calves' }
+          ]
+        },
+        { day_number: 5, name: 'Long Run', focus: 'cardio', estimated_duration_minutes: 50, estimated_calories: 520, notes: 'Longest run of the week. Prioritise completion over pace.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Easy Long Run Zone 2', equipment:'Treadmill / Outdoor', sets:1, reps:'45 min', rest_seconds:0, calories_per_set:480, notes:'Steady Zone 2, hydrate every 15 min' },
+            { order_index:2, exercise_name:'Stretching',           equipment:'No Equipment',        sets:1, reps:'5 min',  rest_seconds:0, calories_per_set:0,   notes:'Full lower body stretch' }
+          ]
+        }
+      ]
+    },
+    'Sculpt & Define': {
+      category: 'body_composition', level: 'Intermediate', duration_weeks: 16, sessions_per_week: 5,
+      color: '#8B5CF6',
+      sessions: [
+        { day_number: 1, name: 'Chest & Shoulders', focus: 'push', estimated_duration_minutes: 55, estimated_calories: 380, notes: 'Superset lat raises with pressing for time efficiency.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Dumbbell Bench Press',     equipment:'Dumbbells',    sets:4, reps:'12', rest_seconds:75, calories_per_set:10, notes:'Full range of motion, elbows at 45°' },
+            { order_index:2, exercise_name:'Cable Crossover',          equipment:'Cable Machine', sets:3, reps:'15', rest_seconds:60, calories_per_set:6,  notes:'Squeeze at centre, full stretch at sides' },
+            { order_index:3, exercise_name:'Seated DB Shoulder Press', equipment:'Dumbbells',    sets:3, reps:'12', rest_seconds:75, calories_per_set:8,  notes:'Controlled, avoid arching lower back' },
+            { order_index:4, exercise_name:'Arnold Press',             equipment:'Dumbbells',    sets:3, reps:'12', rest_seconds:60, calories_per_set:7,  notes:'Rotate palms throughout movement' },
+            { order_index:5, exercise_name:'Cable Lateral Raise',      equipment:'Cable Machine', sets:3, reps:'15', rest_seconds:45, calories_per_set:5,  notes:'Constant tension from cable' },
+            { order_index:6, exercise_name:'Push-Up',                  equipment:'Bodyweight',   sets:3, reps:'15', rest_seconds:45, calories_per_set:4,  notes:'Perfect plank position throughout' }
+          ]
+        },
+        { day_number: 2, name: 'Back & Biceps', focus: 'pull', estimated_duration_minutes: 55, estimated_calories: 370, notes: 'Initiate all pulls with the back, not the arms.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Lat Pulldown',       equipment:'Cable Machine', sets:4, reps:'12',      rest_seconds:75, calories_per_set:9, notes:'Full stretch at top, squeeze at bottom' },
+            { order_index:2, exercise_name:'Cable Row',          equipment:'Cable Machine', sets:4, reps:'12',      rest_seconds:75, calories_per_set:8, notes:'Neutral grip, drive elbows back' },
+            { order_index:3, exercise_name:'Single Arm DB Row',  equipment:'Dumbbells',     sets:3, reps:'12 each', rest_seconds:60, calories_per_set:7, notes:'Brace on bench, retract scapula' },
+            { order_index:4, exercise_name:'Face Pull',          equipment:'Cable Machine', sets:3, reps:'15',      rest_seconds:45, calories_per_set:5, notes:'External rotation at the end' },
+            { order_index:5, exercise_name:'Dumbbell Curl',      equipment:'Dumbbells',     sets:3, reps:'12',      rest_seconds:60, calories_per_set:6, notes:'Controlled on the way down' },
+            { order_index:6, exercise_name:'Hammer Curl',        equipment:'Dumbbells',     sets:3, reps:'12',      rest_seconds:45, calories_per_set:5, notes:'Targets brachialis, neutral grip' }
+          ]
+        },
+        { day_number: 3, name: 'Legs & Glutes', focus: 'legs', estimated_duration_minutes: 60, estimated_calories: 430, notes: 'Focus on glute activation before compound lifts.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Leg Press',          equipment:'Machine',           sets:4, reps:'12', rest_seconds:90, calories_per_set:11, notes:'Drive through heels, full range' },
+            { order_index:2, exercise_name:'Romanian Deadlift',  equipment:'Barbell',           sets:3, reps:'12', rest_seconds:90, calories_per_set:10, notes:'Feel hamstring stretch at bottom' },
+            { order_index:3, exercise_name:'Hip Thrust',         equipment:'Barbell / Machine', sets:4, reps:'15', rest_seconds:75, calories_per_set:8,  notes:'Full hip extension, pause 1 sec at top' },
+            { order_index:4, exercise_name:'Leg Curl',           equipment:'Machine',           sets:3, reps:'15', rest_seconds:60, calories_per_set:6,  notes:'Both concentric and eccentric controlled' },
+            { order_index:5, exercise_name:'Leg Extension',      equipment:'Machine',           sets:3, reps:'15', rest_seconds:60, calories_per_set:6,  notes:'Pause at full extension' },
+            { order_index:6, exercise_name:'Seated Calf Raise',  equipment:'Machine',           sets:4, reps:'20', rest_seconds:45, calories_per_set:3,  notes:'Full stretch at bottom, hold at top' }
+          ]
+        },
+        { day_number: 4, name: 'Arms & Core', focus: 'arms', estimated_duration_minutes: 50, estimated_calories: 310, notes: 'Keep rest periods short to maximise pump.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Tricep Dips',    equipment:'Bodyweight / Bench', sets:3, reps:'12', rest_seconds:75, calories_per_set:7, notes:'Lean forward to emphasise triceps' },
+            { order_index:2, exercise_name:'Skull Crushers', equipment:'Barbell',           sets:3, reps:'12', rest_seconds:75, calories_per_set:6, notes:'Lower to forehead, elbows in' },
+            { order_index:3, exercise_name:'Cable Pushdown', equipment:'Cable Machine',     sets:3, reps:'15', rest_seconds:60, calories_per_set:5, notes:'Full extension, squeeze at bottom' },
+            { order_index:4, exercise_name:'Preacher Curl',  equipment:'Machine / Barbell', sets:3, reps:'12', rest_seconds:60, calories_per_set:6, notes:'No cheating, strict form' },
+            { order_index:5, exercise_name:'Plank',          equipment:'Bodyweight',        sets:3, reps:'60s', rest_seconds:45, calories_per_set:4, notes:'Posterior pelvic tilt, brace hard' },
+            { order_index:6, exercise_name:'Cable Crunch',   equipment:'Cable Machine',     sets:3, reps:'15', rest_seconds:45, calories_per_set:4, notes:'Round spine, contract abs' }
+          ]
+        },
+        { day_number: 5, name: 'Full Body Circuit', focus: 'full_body', estimated_duration_minutes: 55, estimated_calories: 420, notes: 'Move between exercises with minimal rest. High intensity.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Goblet Squat',     equipment:'Kettlebell / Dumbbell', sets:3, reps:'15',      rest_seconds:60, calories_per_set:8, notes:'Elbows inside knees at bottom' },
+            { order_index:2, exercise_name:'DB Deadlift',      equipment:'Dumbbells',             sets:3, reps:'12',      rest_seconds:75, calories_per_set:9, notes:'Flat back, drive hips forward' },
+            { order_index:3, exercise_name:'Push-Up',          equipment:'Bodyweight',            sets:3, reps:'15',      rest_seconds:45, calories_per_set:4, notes:'Full range, chest touches ground' },
+            { order_index:4, exercise_name:'Dumbbell Row',     equipment:'Dumbbells',             sets:3, reps:'12 each', rest_seconds:60, calories_per_set:7, notes:'Alternate arms each set' },
+            { order_index:5, exercise_name:'Dumbbell Lunge',   equipment:'Dumbbells',             sets:3, reps:'12 each', rest_seconds:60, calories_per_set:8, notes:'Step forward, back knee near floor' },
+            { order_index:6, exercise_name:'Mountain Climber', equipment:'Bodyweight',            sets:3, reps:'30s',     rest_seconds:45, calories_per_set:5, notes:'Fast pace, hips level' }
+          ]
+        }
+      ]
+    },
+    'Flex & Flow': {
+      category: 'mobility', level: 'All Levels', duration_weeks: null, sessions_per_week: 7,
+      color: '#06B6D4',
+      sessions: [
+        { day_number: 1, name: 'Morning Mobility', focus: 'mobility', estimated_duration_minutes: 25, estimated_calories: 100, notes: 'Best done first thing in the morning on empty stomach.',
+          program_exercises: [
+            { order_index:1, exercise_name:"Hip Flexor Stretch",       equipment:'No Equipment', sets:2, reps:'60s each', rest_seconds:15, calories_per_set:5, notes:'Lunge position, press hips forward' },
+            { order_index:2, exercise_name:'Cat-Cow',                  equipment:'No Equipment', sets:2, reps:'10',       rest_seconds:10, calories_per_set:3, notes:'Slow and deliberate, full spine' },
+            { order_index:3, exercise_name:"World's Greatest Stretch", equipment:'No Equipment', sets:2, reps:'5 each',   rest_seconds:15, calories_per_set:4, notes:'Thoracic rotation + hip opener' },
+            { order_index:4, exercise_name:'T-Spine Rotation',         equipment:'No Equipment', sets:2, reps:'10 each',  rest_seconds:10, calories_per_set:3, notes:'Keep hips square' },
+            { order_index:5, exercise_name:'Deep Squat Hold',          equipment:'No Equipment', sets:2, reps:'30s',      rest_seconds:15, calories_per_set:3, notes:'Use doorframe if needed' },
+            { order_index:6, exercise_name:'Chest Opener',             equipment:'No Equipment', sets:2, reps:'30s',      rest_seconds:10, calories_per_set:2, notes:'Clasp hands behind back, lift chest' }
+          ]
+        },
+        { day_number: 2, name: 'Hip & Lower Back', focus: 'mobility', estimated_duration_minutes: 30, estimated_calories: 115, notes: 'Focus on controlled breathing in each stretch.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Piriformis Stretch', equipment:'No Equipment', sets:2, reps:'60s each', rest_seconds:15, calories_per_set:4, notes:'Seated or lying — both work' },
+            { order_index:2, exercise_name:'Figure Four',        equipment:'No Equipment', sets:2, reps:'60s each', rest_seconds:15, calories_per_set:4, notes:'Pull shin toward chest gently' },
+            { order_index:3, exercise_name:'Low Lunge Twist',    equipment:'No Equipment', sets:2, reps:'30s each', rest_seconds:10, calories_per_set:3, notes:'Back knee on floor, reach up' },
+            { order_index:4, exercise_name:'Supine Twist',       equipment:'No Equipment', sets:2, reps:'60s each', rest_seconds:10, calories_per_set:3, notes:'Keep shoulders flat on mat' },
+            { order_index:5, exercise_name:"Child's Pose",       equipment:'No Equipment', sets:2, reps:'60s',      rest_seconds:10, calories_per_set:2, notes:'Arms extended forward' },
+            { order_index:6, exercise_name:'Downward Dog',       equipment:'No Equipment', sets:2, reps:'30s',      rest_seconds:10, calories_per_set:3, notes:'Pedal heels alternately' }
+          ]
+        },
+        { day_number: 3, name: 'Shoulder & Upper Body', focus: 'mobility', estimated_duration_minutes: 25, estimated_calories: 95, notes: 'Ideal for desk workers and overhead athletes.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Doorway Chest Stretch',       equipment:'No Equipment', sets:2, reps:'30s each', rest_seconds:10, calories_per_set:2, notes:'Step through doorframe, arms at 90°' },
+            { order_index:2, exercise_name:'Shoulder Circles',            equipment:'No Equipment', sets:2, reps:'10 each',  rest_seconds:10, calories_per_set:3, notes:'Big controlled circles, both directions' },
+            { order_index:3, exercise_name:'Cross Body Shoulder Stretch', equipment:'No Equipment', sets:2, reps:'30s each', rest_seconds:10, calories_per_set:2, notes:'Pull elbow across chest' },
+            { order_index:4, exercise_name:'Thread the Needle',           equipment:'No Equipment', sets:2, reps:'10 each',  rest_seconds:10, calories_per_set:3, notes:'On hands and knees, reach under' },
+            { order_index:5, exercise_name:'Wrist Circles',               equipment:'No Equipment', sets:2, reps:'10 each',  rest_seconds:10, calories_per_set:2, notes:'Both directions, full range' },
+            { order_index:6, exercise_name:'Eagle Arms',                  equipment:'No Equipment', sets:2, reps:'30s',      rest_seconds:10, calories_per_set:2, notes:'Wrap arms, lift elbows' }
+          ]
+        },
+        { day_number: 4, name: 'Full Body Flow', focus: 'mobility', estimated_duration_minutes: 30, estimated_calories: 130, notes: "Connect breath to movement. Hold each pose with intention.",
+          program_exercises: [
+            { order_index:1, exercise_name:'Sun Salutation A',         equipment:'No Equipment', sets:3, reps:'5 rounds',   rest_seconds:30, calories_per_set:10, notes:'Flow at your own pace' },
+            { order_index:2, exercise_name:'Warrior I Flow',           equipment:'No Equipment', sets:2, reps:'60s each',   rest_seconds:15, calories_per_set:5,  notes:'Press back heel firmly down' },
+            { order_index:3, exercise_name:'Triangle Pose',            equipment:'No Equipment', sets:2, reps:'30s each',   rest_seconds:10, calories_per_set:3,  notes:"Reach long, don't compress side" },
+            { order_index:4, exercise_name:'Pigeon Pose',              equipment:'No Equipment', sets:2, reps:'60s each',   rest_seconds:15, calories_per_set:4,  notes:'Deep hip opener, breathe into tightness' },
+            { order_index:5, exercise_name:'Seated Forward Fold',      equipment:'No Equipment', sets:2, reps:'60s',        rest_seconds:10, calories_per_set:3,  notes:'Hinge at hips, spine long' },
+            { order_index:6, exercise_name:'Supine Hamstring Stretch', equipment:'No Equipment', sets:2, reps:'30s each',   rest_seconds:10, calories_per_set:2,  notes:'Use strap or towel if needed' }
+          ]
+        },
+        { day_number: 5, name: 'Rest or Light Walk', focus: 'recovery', estimated_duration_minutes: 20, estimated_calories: 80, notes: 'Optional. Movement without pressure — listen to your body.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Easy Walk', equipment:'Outdoor', sets:1, reps:'20 min', rest_seconds:0, calories_per_set:80, notes:'Flat ground, easy conversational pace' }
+          ]
+        },
+        { day_number: 6, name: 'Hamstrings & Calves', focus: 'mobility', estimated_duration_minutes: 25, estimated_calories: 100, notes: 'Common tight spots for runners and lifters.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Standing Hamstring Stretch',  equipment:'No Equipment', sets:2, reps:'30s each', rest_seconds:10, calories_per_set:3, notes:'Hinge forward, soft knee' },
+            { order_index:2, exercise_name:'Seated Hamstring Stretch',    equipment:'No Equipment', sets:2, reps:'60s each', rest_seconds:10, calories_per_set:3, notes:'Reach for toes, back flat' },
+            { order_index:3, exercise_name:'Standing Calf Stretch',       equipment:'No Equipment', sets:2, reps:'30s each', rest_seconds:10, calories_per_set:2, notes:'Step back, heel on floor' },
+            { order_index:4, exercise_name:'Downward Dog to Calf Raise',  equipment:'No Equipment', sets:2, reps:'10 reps',  rest_seconds:15, calories_per_set:3, notes:'Rise onto toes from down dog' },
+            { order_index:5, exercise_name:'Seated Toe Reach',            equipment:'No Equipment', sets:2, reps:'30s',      rest_seconds:10, calories_per_set:2, notes:'Both legs extended, reach forward' }
+          ]
+        },
+        { day_number: 7, name: 'Full Body Recovery', focus: 'recovery', estimated_duration_minutes: 30, estimated_calories: 110, notes: 'Parasympathetic reset. No intensity, full body scan.',
+          program_exercises: [
+            { order_index:1, exercise_name:'Foam Rolling',     equipment:'Foam Roller', sets:1, reps:'15 min', rest_seconds:0, calories_per_set:60, notes:'Full body: quads, IT band, upper back, lats' },
+            { order_index:2, exercise_name:'Light Stretching', equipment:'No Equipment',sets:1, reps:'15 min', rest_seconds:0, calories_per_set:50, notes:'Hold each stretch 30–60 s, no bouncing' }
+          ]
+        }
+      ]
+    }
+  };
+
+  const PROGRAM_DETAIL_MODAL = document.getElementById('program-detail-modal');
+  const PROGRAM_DETAIL_CONTENT = document.getElementById('program-detail-content');
+  const PROGRAM_DETAIL_CLOSE = document.getElementById('program-detail-close');
+
+  if (PROGRAM_DETAIL_CLOSE) {
+    PROGRAM_DETAIL_CLOSE.addEventListener('click', () => {
+      PROGRAM_DETAIL_MODAL.style.display = 'none';
+      document.body.style.overflow = '';
+    });
+  }
+
+  if (PROGRAM_DETAIL_MODAL) {
+    PROGRAM_DETAIL_MODAL.addEventListener('click', e => {
+      if (e.target === PROGRAM_DETAIL_MODAL) {
+        PROGRAM_DETAIL_MODAL.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+  }
+
+  function renderProgramDetailModal(programName, sessions, programMeta) {
+    const color = programMeta.color || '#F97316';
+    const categoryLabel = (programMeta.category || 'program').replace('_', ' ');
+    const durationLabel = programMeta.duration_weeks
+      ? programMeta.duration_weeks + ' weeks'
+      : 'Ongoing';
+    const frequencyLabel = programMeta.sessions_per_week === 7
+      ? 'Daily'
+      : (programMeta.sessions_per_week || '–') + 'x / week';
+
+    const isGuest = !(currentUser && currentUser.id !== 'guest');
+
+    // Build tab buttons
+    const tabButtons = sessions.map((s, i) => `
+      <button
+        class="pd-session-tab${i === 0 ? ' active' : ''}"
+        data-tab-idx="${i}"
+        style="${i === 0 ? `border-color:${color};color:${color};background:${color}18` : ''}"
+        aria-selected="${i === 0}"
+      >
+        <span class="pd-tab-day">Day ${s.day_number}</span>
+        <span class="pd-tab-name">${escHtml(s.name)}</span>
+      </button>
+    `).join('');
+
+    // Build each session panel
+    const sessionPanels = sessions.map((s, i) => {
+      const exercises = (s.program_exercises || [])
+        .slice()
+        .sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+
+      const exRows = exercises.map((ex, idx) => {
+        const setsLabel = ex.sets && ex.reps ? `${ex.sets} × ${ex.reps}` : ex.reps || ex.sets || '–';
+        const restLabel = ex.rest_seconds > 0 ? `${ex.rest_seconds}s` : '–';
+        const totalCal  = (ex.calories_per_set || 0) * (ex.sets || 1);
+        return `
+          <div class="pd-exercise-row">
+            <div class="pd-ex-num">${idx + 1}</div>
+            <div class="pd-ex-info">
+              <div class="pd-ex-name">${escHtml(ex.exercise_name)}</div>
+              <div class="pd-ex-equip">${escHtml(ex.equipment || '–')}</div>
+              ${ex.notes ? `<div class="pd-ex-note">${escHtml(ex.notes)}</div>` : ''}
+            </div>
+            <div class="pd-ex-sets">${escHtml(setsLabel)}</div>
+            <div class="pd-ex-rest">${restLabel} rest</div>
+            <div class="pd-ex-cal">${totalCal > 0 ? '~' + totalCal + ' cal' : '–'}</div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="pd-session-panel${i === 0 ? ' active' : ''}" data-panel-idx="${i}">
+          <div class="pd-session-header">
+            <div>
+              <div class="pd-session-focus" style="color:${color}">${escHtml((s.focus || '').replace('_',' '))}</div>
+              <h4 class="pd-session-title">${escHtml(s.name)}</h4>
+              ${s.notes ? `<p class="pd-session-notes">${escHtml(s.notes)}</p>` : ''}
+            </div>
+            <div class="pd-session-stats">
+              <div class="pd-session-stat">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                ${s.estimated_duration_minutes || '–'} min
+              </div>
+              <div class="pd-session-stat">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                ~${s.estimated_calories || '–'} cal
+              </div>
+            </div>
+          </div>
+
+          <div class="pd-exercise-table">
+            <div class="pd-exercise-header">
+              <div class="pd-ex-num">#</div>
+              <div class="pd-ex-info">Exercise</div>
+              <div class="pd-ex-sets">Sets × Reps</div>
+              <div class="pd-ex-rest">Rest</div>
+              <div class="pd-ex-cal">Est. Cal</div>
+            </div>
+            ${exRows}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const startBtn = isGuest
+      ? `<button class="btn btn-primary" onclick="window.openAuthModal('signup')">Sign Up to Start This Program</button>`
+      : `<button class="btn btn-primary" onclick="window.enrollProgram('${escHtml(programName)}');document.getElementById('program-detail-modal').style.display='none';document.body.style.overflow=''">Start This Program</button>`;
+
+    PROGRAM_DETAIL_CONTENT.innerHTML = `
+      <div class="pd-header" style="background: linear-gradient(135deg, ${color}22 0%, transparent 100%); border-bottom: 1px solid ${color}33">
+        <div class="pd-tag" style="color:${color};border-color:${color}44">${escHtml(categoryLabel)}</div>
+        <h2 class="pd-title">${escHtml(programName)}</h2>
+        <div class="pd-stats">
+          <span class="pd-stat-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            ${durationLabel}
+          </span>
+          <span class="pd-stat-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 20V10M12 20V4M18 20V14"/></svg>
+            ${frequencyLabel}
+          </span>
+          <span class="pd-stat-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            ${escHtml(programMeta.level || 'All Levels')}
+          </span>
+        </div>
+      </div>
+
+      <div class="pd-body">
+        <h3 class="pd-section-title">Week 1 Schedule</h3>
+        <div class="pd-sessions-tabs" role="tablist" aria-label="Training days">
+          ${tabButtons}
+        </div>
+        <div class="pd-sessions-content">
+          ${sessionPanels}
+        </div>
+        <div class="pd-footer">
+          ${startBtn}
+          ${isGuest ? `<p class="pd-guest-note">Preview only — create a free account to save progress and track all ${sessions.length} sessions</p>` : ''}
+        </div>
+      </div>
+    `;
+
+    // Tab switching logic
+    const tabs   = PROGRAM_DETAIL_CONTENT.querySelectorAll('.pd-session-tab');
+    const panels = PROGRAM_DETAIL_CONTENT.querySelectorAll('.pd-session-panel');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const idx = parseInt(tab.dataset.tabIdx, 10);
+        tabs.forEach((t, i) => {
+          const isActive = i === idx;
+          t.classList.toggle('active', isActive);
+          t.setAttribute('aria-selected', isActive);
+          if (isActive) {
+            t.style.borderColor = color;
+            t.style.color       = color;
+            t.style.background  = color + '18';
+          } else {
+            t.style.borderColor = '';
+            t.style.color       = '';
+            t.style.background  = '';
+          }
+        });
+        panels.forEach((p, i) => p.classList.toggle('active', i === idx));
+      });
+    });
+  }
+
+  window.openProgramDetail = async function(programName) {
+    if (!PROGRAM_DETAIL_MODAL) return;
+    // Decode HTML entities that may be passed from onclick attributes
+    const name = programName.replace(/&amp;/g, '&');
+
+    PROGRAM_DETAIL_MODAL.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // Show loading state
+    PROGRAM_DETAIL_CONTENT.innerHTML = `
+      <div class="pd-loading">
+        <div class="pd-spinner"></div>
+        <p>Loading program...</p>
+      </div>
+    `;
+
+    const staticMeta = PROGRAM_DETAIL_DATA[name];
+    if (!staticMeta) {
+      PROGRAM_DETAIL_CONTENT.innerHTML = `<div class="pd-loading"><p style="color:var(--text-2)">Program not found.</p></div>`;
+      return;
+    }
+
+    // Try fetching live data from Supabase if user is authenticated
+    const isGuestMode = window.isGuest && window.isGuest();
+    let sessions = null;
+
+    if (!isGuestMode) {
+      try {
+        const session = await getSession().catch(() => null);
+        if (session) {
+          const { data: prog } = await db.from('programs').select('id').eq('name', name).single();
+          if (prog) {
+            const { data } = await getProgramSessions(prog.id);
+            if (data && data.length > 0) sessions = data;
+          }
+        }
+      } catch (e) {
+        console.warn('[openProgramDetail] Supabase fetch failed, using static data:', e);
+      }
+    }
+
+    // Fall back to static data
+    if (!sessions) sessions = staticMeta.sessions;
+
+    renderProgramDetailModal(name, sessions, staticMeta);
+  };
 
 })();

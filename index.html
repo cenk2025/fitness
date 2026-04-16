@@ -244,7 +244,7 @@
 
     <div class="programs-grid">
 
-      <div class="program-card program-strength">
+      <div class="program-card program-strength" style="cursor:pointer" data-program-name="Power Foundation" onclick="window.openProgramDetail('Power Foundation')">
         <div class="program-img">
           <div class="program-illustration strength-ill" aria-hidden="true">
             <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -279,11 +279,11 @@
               8,240 athletes
             </span>
           </div>
-          <a href="#" class="btn btn-program" data-program="Power Foundation" data-i18n="programs.start">Start Program</a>
+          <button class="btn btn-program" onclick="event.stopPropagation();window.openProgramDetail('Power Foundation')" data-i18n="programs.start">Start Program</button>
         </div>
       </div>
 
-      <div class="program-card program-cardio">
+      <div class="program-card program-cardio" style="cursor:pointer" data-program-name="Endurance Engine" onclick="window.openProgramDetail('Endurance Engine')">
         <div class="program-img">
           <div class="program-illustration cardio-ill" aria-hidden="true">
             <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -315,11 +315,11 @@
               12,500 athletes
             </span>
           </div>
-          <a href="#" class="btn btn-program btn-program-green" data-program="Endurance Engine" data-i18n="programs.start">Start Program</a>
+          <button class="btn btn-program btn-program-green" onclick="event.stopPropagation();window.openProgramDetail('Endurance Engine')" data-i18n="programs.start">Start Program</button>
         </div>
       </div>
 
-      <div class="program-card program-body">
+      <div class="program-card program-body" style="cursor:pointer" data-program-name="Sculpt &amp; Define" onclick="window.openProgramDetail('Sculpt &amp; Define')">
         <div class="program-img">
           <div class="program-illustration body-ill" aria-hidden="true">
             <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -350,11 +350,11 @@
               9,800 athletes
             </span>
           </div>
-          <a href="#" class="btn btn-program btn-program-purple" data-program="Sculpt &amp; Define" data-i18n="programs.start">Start Program</a>
+          <button class="btn btn-program btn-program-purple" onclick="event.stopPropagation();window.openProgramDetail('Sculpt &amp; Define')" data-i18n="programs.start">Start Program</button>
         </div>
       </div>
 
-      <div class="program-card program-mobility">
+      <div class="program-card program-mobility" style="cursor:pointer" data-program-name="Flex &amp; Flow" onclick="window.openProgramDetail('Flex &amp; Flow')">
         <div class="program-img">
           <div class="program-illustration mobility-ill" aria-hidden="true">
             <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -385,7 +385,7 @@
               21,000 athletes
             </span>
           </div>
-          <a href="#" class="btn btn-program btn-program-cyan" data-program="Flex &amp; Flow" data-i18n="programs.start">Start Program</a>
+          <button class="btn btn-program btn-program-cyan" onclick="event.stopPropagation();window.openProgramDetail('Flex &amp; Flow')" data-i18n="programs.start">Start Program</button>
         </div>
       </div>
 
@@ -1894,6 +1894,21 @@
     </section>
 
   </main>
+</div>
+
+<!-- ══════════════ PROGRAM DETAIL MODAL ══════════════ -->
+<div id="program-detail-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Program Details" style="display:none">
+  <div class="modal-card program-detail-card">
+    <button class="modal-close" id="program-detail-close" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div id="program-detail-content">
+      <div class="pd-loading">
+        <div class="pd-spinner"></div>
+        <p>Loading program...</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="config.js?v=20260416"></script>

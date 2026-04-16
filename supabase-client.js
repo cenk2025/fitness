@@ -113,6 +113,31 @@ async function getUserPrograms(userId) {
   return { data, error };
 }
 
+// ── Program sessions & exercises ──────────────────
+async function getProgramSessions(programId) {
+  const { data, error } = await db
+    .from('program_sessions')
+    .select(`
+      *,
+      program_exercises (
+        id, order_index, exercise_name, equipment,
+        sets, reps, rest_seconds, duration_seconds,
+        notes, calories_per_set
+      )
+    `)
+    .eq('program_id', programId)
+    .order('week_number')
+    .order('day_number');
+  if (data) {
+    data.forEach(session => {
+      if (session.program_exercises) {
+        session.program_exercises.sort((a, b) => a.order_index - b.order_index);
+      }
+    });
+  }
+  return { data, error };
+}
+
 // ── Streak helper ─────────────────────────────────
 async function getStreak(userId) {
   const { data } = await db
