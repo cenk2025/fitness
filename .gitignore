@@ -1,0 +1,13 @@
+# macOS metadata
+._*
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Credentials — copy config.example.js and fill in your keys
+config.js
+
+# Misc
+*.log
+node_modules/
+dist/
