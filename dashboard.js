@@ -66,19 +66,25 @@
 
   // ── Open / Close ─────────────────────────────────
   async function openDashboard() {
-    const guest = window.isGuest && window.isGuest();
-    if (!guest) {
-      const session = await getSession();
-      if (!session) { window.openAuthModal('login'); return; }
-      currentUser = session.user;
-    } else {
-      currentUser = { id: 'guest', email: 'guest@vfitness.app' };
-    }
+    try {
+      const guest = window.isGuest && window.isGuest();
+      if (!guest) {
+        const session = await getSession();
+        if (!session) { window.openAuthModal('login'); return; }
+        currentUser = session.user;
+      } else {
+        currentUser = { id: 'guest', email: 'guest@vfitness.app' };
+      }
 
-    overlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    await loadAll();
-    switchPanel('overview');
+      overlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      await loadAll();
+      switchPanel('overview');
+    } catch (err) {
+      console.error('[Dashboard] openDashboard failed:', err);
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }
   }
   window.openDashboard = openDashboard;
 

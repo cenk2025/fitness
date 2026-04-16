@@ -124,13 +124,21 @@
     if (!password) return setError('login-pw-err',   'Password is required.');
 
     setLoading(loginSubmit, true);
-    const { error } = await db.auth.signInWithPassword({ email, password });
+    let loginError;
+    try {
+      ({ error: loginError } = await db.auth.signInWithPassword({ email, password }));
+    } catch (err) {
+      setLoading(loginSubmit, false);
+      setError('login-error', 'Connection error. Please check your internet and try again.');
+      console.error('[Login]', err);
+      return;
+    }
     setLoading(loginSubmit, false);
 
-    if (error) {
-      setError('login-error', error.message === 'Invalid login credentials'
+    if (loginError) {
+      setError('login-error', loginError.message === 'Invalid login credentials'
         ? 'Incorrect email or password.'
-        : error.message);
+        : loginError.message);
       return;
     }
     closeModal();
@@ -153,11 +161,19 @@
     if (password.length < 8) return setError('signup-pw-err', 'Password must be at least 8 characters.');
 
     setLoading(signupSubmit, true);
-    const { data, error } = await db.auth.signUp({
-      email,
-      password,
-      options: { data: { first_name: fname, last_name: lname } }
-    });
+    let data, error;
+    try {
+      ({ data, error } = await db.auth.signUp({
+        email,
+        password,
+        options: { data: { first_name: fname, last_name: lname } }
+      }));
+    } catch (err) {
+      setLoading(signupSubmit, false);
+      setError('signup-error', 'Connection error. Please check your internet and try again.');
+      console.error('[Signup]', err);
+      return;
+    }
     setLoading(signupSubmit, false);
 
     if (error) { setError('signup-error', error.message); return; }
@@ -237,27 +253,31 @@
     }
   }
 
+  // ── Expose for dashboard.js (must be before onAuthStateChange) ──
+  window.isGuest = isGuest;
+
   // ── Listen to auth changes ───────────────────────
-  db.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_IN') {
-      clearGuestSession();
-    }
-    updateNavState();
-    if (event === 'SIGNED_OUT') {
-      clearGuestSession();
-      const overlay = document.getElementById('dashboard-overlay');
-      if (overlay) overlay.style.display = 'none';
-      document.body.style.overflow = '';
-    }
-  });
+  try {
+    db.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        clearGuestSession();
+      }
+      updateNavState();
+      if (event === 'SIGNED_OUT') {
+        clearGuestSession();
+        const overlay = document.getElementById('dashboard-overlay');
+        if (overlay) overlay.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+  } catch (err) {
+    console.error('[Auth] onAuthStateChange failed:', err);
+  }
 
   // ── Dashboard button ─────────────────────────────
   navDashBtn?.addEventListener('click', () => {
     window.openDashboard && window.openDashboard();
   });
-
-  // ── Expose for dashboard.js ───────────────────────
-  window.isGuest = isGuest;
 
   // ── Init ─────────────────────────────────────────
   updateNavState();
