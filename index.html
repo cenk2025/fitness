@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="V Fitness — Premium training platform for everyone. From beginner to elite athlete." />
+  <title>V Fitness — Train Smarter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════ COOKIE CONSENT ══════════════════════════ -->
+<div id="cookie-banner" class="cookie-banner" role="dialog" aria-label="Cookie consent">
+  <div class="cookie-inner">
+    <div class="cookie-text">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+      <p id="cookie-msg">We use cookies to personalize your experience and track performance. <a href="#" class="cookie-link">Privacy Policy</a></p>
+    </div>
+    <div class="cookie-actions">
+      <button id="cookie-decline" class="btn-cookie-secondary" aria-label="Decline cookies">Decline</button>
+      <button id="cookie-accept" class="btn-cookie-primary" aria-label="Accept cookies">Accept All</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ NAVBAR ══════════════════════════ -->
+<header class="navbar" id="navbar" role="banner">
+  <nav class="nav-inner" aria-label="Main navigation">
+    <a href="#" class="nav-logo" aria-label="V Fitness home">
+      <span class="logo-text">V <span class="logo-accent">FITNESS</span></span>
+    </a>
+
+    <ul class="nav-links" role="list">
+      <li><a href="#programs" class="nav-link" data-i18n="nav.programs">Programs</a></li>
+      <li><a href="#workouts" class="nav-link" data-i18n="nav.workouts">Workouts</a></li>
+      <li><a href="#nutrition" class="nav-link" data-i18n="nav.nutrition">Nutrition</a></li>
+      <li><a href="#progress" class="nav-link" data-i18n="nav.progress">Progress</a></li>
+      <li><a href="#pricing" class="nav-link" data-i18n="nav.pricing">Pricing</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <button class="lang-toggle" id="lang-btn" aria-label="Switch language">
+        <span id="lang-label">FI</span>
+      </button>
+
+      <!-- Logged-out state -->
+      <div id="nav-logged-out" class="nav-auth-group">
+        <button class="btn btn-ghost btn-nav-login" id="nav-login-btn" aria-label="Log in" data-i18n="nav.login">Log In</button>
+        <button class="btn btn-nav" id="nav-signup-btn" aria-label="Sign up" data-i18n="nav.cta">Start Free</button>
+      </div>
+
+      <!-- Logged-in state (hidden until auth) -->
+      <div id="nav-logged-in" class="nav-user-group" style="display:none">
+        <div class="nav-user-info">
+          <div class="nav-avatar" id="nav-avatar" aria-hidden="true"></div>
+          <div class="nav-user-details">
+            <span class="nav-user-name" id="nav-user-name">–</span>
+            <span class="nav-user-plan" id="nav-user-plan">Free</span>
+          </div>
+        </div>
+        <button class="btn btn-nav btn-dashboard" id="nav-dashboard-btn" data-i18n="nav.dashboard">Dashboard</button>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    <a href="#programs" class="mobile-link" data-i18n="nav.programs">Programs</a>
+    <a href="#workouts" class="mobile-link" data-i18n="nav.workouts">Workouts</a>
+    <a href="#nutrition" class="mobile-link" data-i18n="nav.nutrition">Nutrition</a>
+    <a href="#progress" class="mobile-link" data-i18n="nav.progress">Progress</a>
+    <a href="#pricing" class="mobile-link" data-i18n="nav.pricing">Pricing</a>
+    <a href="#pricing" class="btn btn-primary w-full mt-s2" data-i18n="nav.cta">Start Free</a>
+  </div>
+</header>
+
+<!-- ══════════════════════════ HERO ══════════════════════════ -->
+<section class="hero" id="hero" aria-label="Hero section">
+  <div class="hero-bg">
+    <div class="hero-grid"></div>
+    <div class="hero-orb orb-1" aria-hidden="true"></div>
+    <div class="hero-orb orb-2" aria-hidden="true"></div>
+    <div class="hero-orb orb-3" aria-hidden="true"></div>
+  </div>
+
+  <div class="container hero-container">
+    <div class="hero-badge" aria-label="Over 50,000 athletes">
+      <span class="badge-dot"></span>
+      <span data-i18n="hero.badge">50,000+ Athletes Worldwide</span>
+    </div>
+
+    <h1 class="hero-title">
+      <span class="title-line" data-i18n="hero.title1">BUILD YOUR</span>
+      <span class="title-line title-accent" data-i18n="hero.title2">STRONGEST</span>
+      <span class="title-line" data-i18n="hero.title3">SELF</span>
+    </h1>
+
+    <p class="hero-sub" data-i18n="hero.sub">
+      Science-backed training programs, real-time coaching, and intelligent nutrition — for every level from first rep to elite athlete.
+    </p>
+
+    <div class="hero-ctas">
+      <a href="#programs" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Start Training Free</a>
+      <a href="#workouts" class="btn btn-ghost btn-lg" data-i18n="hero.cta2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="5,3 19,12 5,21"/></svg>
+        Watch Preview
+      </a>
+    </div>
+
+    <div class="hero-stats" role="list" aria-label="Platform statistics">
+      <div class="stat-item" role="listitem">
+        <span class="stat-num">500+</span>
+        <span class="stat-label" data-i18n="hero.stat1">Workouts</span>
+      </div>
+      <div class="stat-divider" aria-hidden="true"></div>
+      <div class="stat-item" role="listitem">
+        <span class="stat-num">120+</span>
+        <span class="stat-label" data-i18n="hero.stat2">Programs</span>
+      </div>
+      <div class="stat-divider" aria-hidden="true"></div>
+      <div class="stat-item" role="listitem">
+        <span class="stat-num">98%</span>
+        <span class="stat-label" data-i18n="hero.stat3">Satisfaction</span>
+      </div>
+      <div class="stat-divider" aria-hidden="true"></div>
+      <div class="stat-item" role="listitem">
+        <span class="stat-num">24/7</span>
+        <span class="stat-label" data-i18n="hero.stat4">AI Coach</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Visual -->
+  <div class="hero-visual" aria-hidden="true">
+    <div class="phone-mockup">
+      <div class="phone-screen">
+        <div class="app-ui">
+          <div class="app-header">
+            <div class="app-avatar"></div>
+            <div>
+              <div class="app-greeting">Good morning,</div>
+              <div class="app-name">Alex</div>
+            </div>
+            <div class="app-streak">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316"><path d="M12 2c0 0-5 5-5 10a5 5 0 0010 0c0-5-5-10-5-10z"/></svg>
+              7
+            </div>
+          </div>
+          <div class="app-card-today">
+            <div class="today-label">TODAY'S WORKOUT</div>
+            <div class="today-title">Upper Body Power</div>
+            <div class="today-meta">
+              <span>6 exercises</span>
+              <span>45 min</span>
+            </div>
+            <div class="today-progress">
+              <div class="progress-bar-fill" style="width:60%"></div>
+            </div>
+          </div>
+          <div class="app-rings">
+            <div class="ring-item">
+              <svg width="48" height="48" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="20" fill="none" stroke="#1a1a2e" stroke-width="5"/>
+                <circle cx="24" cy="24" r="20" fill="none" stroke="#F97316" stroke-width="5" stroke-dasharray="75.4 125.6" stroke-dashoffset="31.4" stroke-linecap="round"/>
+              </svg>
+              <div class="ring-val">7,240</div>
+              <div class="ring-lbl">Steps</div>
+            </div>
+            <div class="ring-item">
+              <svg width="48" height="48" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="20" fill="none" stroke="#1a1a2e" stroke-width="5"/>
+                <circle cx="24" cy="24" r="20" fill="none" stroke="#22C55E" stroke-width="5" stroke-dasharray="94.2 125.6" stroke-dashoffset="31.4" stroke-linecap="round"/>
+              </svg>
+              <div class="ring-val">2,180</div>
+              <div class="ring-lbl">kcal</div>
+            </div>
+            <div class="ring-item">
+              <svg width="48" height="48" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="20" fill="none" stroke="#1a1a2e" stroke-width="5"/>
+                <circle cx="24" cy="24" r="20" fill="none" stroke="#8B5CF6" stroke-width="5" stroke-dasharray="50.3 125.6" stroke-dashoffset="31.4" stroke-linecap="round"/>
+              </svg>
+              <div class="ring-val">38 min</div>
+              <div class="ring-lbl">Active</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="floating-card fc-1">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span>New PR! +12kg</span>
+    </div>
+    <div class="floating-card fc-2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" aria-hidden="true"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg>
+      <span>+8% strength</span>
+    </div>
+  </div>
+
+  <div class="hero-scroll" aria-label="Scroll down">
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ LEVELS BAND ══════════════════════════ -->
+<div class="levels-band" aria-label="Training levels">
+  <div class="container levels-inner">
+    <div class="level-pill beginner" tabindex="0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22V12M12 12L8 16M12 12L16 16"/><circle cx="12" cy="6" r="3"/></svg>
+      <span data-i18n="level.beginner">Beginner</span>
+    </div>
+    <div class="level-arrow" aria-hidden="true">→</div>
+    <div class="level-pill intermediate" tabindex="0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 20V10M12 20V4M18 20V14"/></svg>
+      <span data-i18n="level.intermediate">Intermediate</span>
+    </div>
+    <div class="level-arrow" aria-hidden="true">→</div>
+    <div class="level-pill advanced" tabindex="0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+      <span data-i18n="level.advanced">Advanced</span>
+    </div>
+    <div class="level-arrow" aria-hidden="true">→</div>
+    <div class="level-pill elite" tabindex="0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      <span data-i18n="level.elite">Elite</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PROGRAMS ══════════════════════════ -->
+<section class="section" id="programs" aria-label="Training programs">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag" data-i18n="programs.tag">Training Programs</span>
+      <h2 class="section-title"><span data-i18n="programs.title.prefix">Every Goal.</span> <span class="text-gradient" data-i18n="programs.title.suffix">Every Level.</span></h2>
+      <p class="section-sub" data-i18n="programs.sub">Structured programs built by certified coaches and sports scientists — with progressive overload baked in.</p>
+    </div>
+
+    <div class="programs-grid">
+
+      <div class="program-card program-strength">
+        <div class="program-img">
+          <div class="program-illustration strength-ill" aria-hidden="true">
+            <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="20" y="70" width="160" height="10" rx="5" fill="#F97316" opacity="0.3"/>
+              <rect x="10" y="60" width="20" height="30" rx="4" fill="#F97316" opacity="0.6"/>
+              <rect x="170" y="60" width="20" height="30" rx="4" fill="#F97316" opacity="0.6"/>
+              <circle cx="100" cy="65" r="30" fill="none" stroke="#F97316" stroke-width="2" opacity="0.4"/>
+              <path d="M80 100 Q100 75 120 100" stroke="#F97316" stroke-width="2.5" fill="none"/>
+              <circle cx="100" cy="55" r="12" fill="#F97316" opacity="0.2" stroke="#F97316" stroke-width="1.5"/>
+              <line x1="100" y1="67" x2="100" y2="100" stroke="#F97316" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="100" y1="80" x2="88" y2="92" stroke="#F97316" stroke-width="2" stroke-linecap="round"/>
+              <line x1="100" y1="80" x2="112" y2="92" stroke="#F97316" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="program-level-badge" data-i18n="level.all">All Levels</span>
+        </div>
+        <div class="program-body">
+          <div class="program-tag" data-i18n="programs.strength.tag">Strength</div>
+          <h3 class="program-name" data-i18n="programs.strength.name">Power Foundation</h3>
+          <p class="program-desc" data-i18n="programs.strength.desc">12-week progressive overload program. Squat, bench, deadlift — build a bulletproof foundation.</p>
+          <div class="program-meta">
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+              12 weeks
+            </span>
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 20V10M12 20V4M18 20V14"/></svg>
+              4x/week
+            </span>
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+              8,240 athletes
+            </span>
+          </div>
+          <a href="#pricing" class="btn btn-program" data-i18n="programs.start">Start Program</a>
+        </div>
+      </div>
+
+      <div class="program-card program-cardio">
+        <div class="program-img">
+          <div class="program-illustration cardio-ill" aria-hidden="true">
+            <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M30 100 Q50 40 70 80 Q90 120 110 60 Q130 20 150 70 Q160 90 170 80" stroke="#22C55E" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <circle cx="150" cy="70" r="5" fill="#22C55E" opacity="0.8"/>
+              <path d="M20 110 L180 110" stroke="#22C55E" stroke-width="1" opacity="0.3"/>
+              <circle cx="70" cy="125" r="18" fill="none" stroke="#22C55E" stroke-width="2" opacity="0.4"/>
+              <circle cx="130" cy="125" r="18" fill="none" stroke="#22C55E" stroke-width="2" opacity="0.4"/>
+              <path d="M70 107 L85 125 L100 107" stroke="#22C55E" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="program-level-badge" data-i18n="level.beginner">Beginner</span>
+        </div>
+        <div class="program-body">
+          <div class="program-tag" data-i18n="programs.cardio.tag">Cardio</div>
+          <h3 class="program-name" data-i18n="programs.cardio.name">Endurance Engine</h3>
+          <p class="program-desc" data-i18n="programs.cardio.desc">HIIT, steady-state, and interval training to skyrocket your VO₂ Max and cardiovascular endurance.</p>
+          <div class="program-meta">
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+              8 weeks
+            </span>
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 20V10M12 20V4M18 20V14"/></svg>
+              5x/week
+            </span>
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              12,500 athletes
+            </span>
+          </div>
+          <a href="#pricing" class="btn btn-program btn-program-green" data-i18n="programs.start">Start Program</a>
+        </div>
+      </div>
+
+      <div class="program-card program-body">
+        <div class="program-img">
+          <div class="program-illustration body-ill" aria-hidden="true">
+            <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="100" cy="45" r="22" fill="none" stroke="#8B5CF6" stroke-width="2" opacity="0.6"/>
+              <path d="M78 67 L70 110 L90 110 L100 85 L110 110 L130 110 L122 67" stroke="#8B5CF6" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+              <path d="M78 75 L60 90 L65 100 L82 88" stroke="#8B5CF6" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M122 75 L140 90 L135 100 L118 88" stroke="#8B5CF6" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M88 67 L90 80 L100 75 L110 80 L112 67" stroke="#8B5CF6" stroke-width="2" fill="none" opacity="0.5"/>
+            </svg>
+          </div>
+          <span class="program-level-badge" data-i18n="level.intermediate">Intermediate</span>
+        </div>
+        <div class="program-body-wrap">
+          <div class="program-tag" data-i18n="programs.body.tag">Body Composition</div>
+          <h3 class="program-name" data-i18n="programs.body.name">Sculpt & Define</h3>
+          <p class="program-desc" data-i18n="programs.body.desc">Targeted muscle hypertrophy meets strategic fat loss. Transform your physique in 16 weeks.</p>
+          <div class="program-meta">
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+              16 weeks
+            </span>
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 20V10M12 20V4M18 20V14"/></svg>
+              5x/week
+            </span>
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              9,800 athletes
+            </span>
+          </div>
+          <a href="#pricing" class="btn btn-program btn-program-purple" data-i18n="programs.start">Start Program</a>
+        </div>
+      </div>
+
+      <div class="program-card program-mobility">
+        <div class="program-img">
+          <div class="program-illustration mobility-ill" aria-hidden="true">
+            <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="100" cy="80" r="55" fill="none" stroke="#06B6D4" stroke-width="1" opacity="0.2" stroke-dasharray="8 4"/>
+              <circle cx="100" cy="80" r="35" fill="none" stroke="#06B6D4" stroke-width="1" opacity="0.3" stroke-dasharray="6 3"/>
+              <path d="M100 40 C120 40 130 60 100 80 C70 100 80 120 100 120" stroke="#06B6D4" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <circle cx="100" cy="40" r="6" fill="#06B6D4" opacity="0.8"/>
+              <circle cx="100" cy="120" r="6" fill="#06B6D4" opacity="0.4"/>
+            </svg>
+          </div>
+          <span class="program-level-badge" data-i18n="level.all">All Levels</span>
+        </div>
+        <div class="program-body-wrap">
+          <div class="program-tag" data-i18n="programs.mobility.tag">Mobility</div>
+          <h3 class="program-name" data-i18n="programs.mobility.name">Flex & Flow</h3>
+          <p class="program-desc" data-i18n="programs.mobility.desc">Daily mobility routines, yoga flows, and recovery protocols. Move better, feel better, perform better.</p>
+          <div class="program-meta">
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+              Ongoing
+            </span>
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 20V10M12 20V4M18 20V14"/></svg>
+              Daily
+            </span>
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              21,000 athletes
+            </span>
+          </div>
+          <a href="#pricing" class="btn btn-program btn-program-cyan" data-i18n="programs.start">Start Program</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ WORKOUTS ══════════════════════════ -->
+<section class="section section-alt" id="workouts" aria-label="Workout library">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag" data-i18n="workouts.tag">Exercise Library</span>
+      <h2 class="section-title"><span data-i18n="workouts.title.prefix">500+</span> <span class="text-gradient" data-i18n="workouts.title.suffix">Expert Workouts</span></h2>
+      <p class="section-sub" data-i18n="workouts.sub">Filter by muscle group, equipment, duration, or intensity. Every exercise includes coaching cues and form videos.</p>
+    </div>
+
+    <div class="workout-filters" role="group" aria-label="Filter workouts">
+      <button class="filter-btn active" data-filter="all" data-i18n="workouts.filter.all">All</button>
+      <button class="filter-btn" data-filter="chest" data-i18n="workouts.filter.chest">Chest</button>
+      <button class="filter-btn" data-filter="back" data-i18n="workouts.filter.back">Back</button>
+      <button class="filter-btn" data-filter="legs" data-i18n="workouts.filter.legs">Legs</button>
+      <button class="filter-btn" data-filter="shoulders" data-i18n="workouts.filter.shoulders">Shoulders</button>
+      <button class="filter-btn" data-filter="core" data-i18n="workouts.filter.core">Core</button>
+      <button class="filter-btn" data-filter="hiit" data-i18n="workouts.filter.hiit">HIIT</button>
+    </div>
+
+    <div class="workouts-grid" id="workouts-grid" role="list">
+
+      <article class="workout-card" data-category="chest" role="listitem">
+        <div class="wk-visual">
+          <svg viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="35" y="40" width="50" height="8" rx="4" fill="#F97316" opacity="0.3"/>
+            <rect x="25" y="34" width="15" height="20" rx="3" fill="#F97316" opacity="0.5"/>
+            <rect x="80" y="34" width="15" height="20" rx="3" fill="#F97316" opacity="0.5"/>
+            <path d="M50 34 L60 20 L70 34" stroke="#F97316" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M55 40 L55 65 M65 40 L65 65" stroke="#F97316" stroke-width="2" stroke-linecap="round"/>
+            <path d="M55 55 L48 65 M65 55 L72 65" stroke="#F97316" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="wk-body">
+          <div class="wk-tags">
+            <span class="wk-tag wk-strength" data-i18n="tag.strength">Strength</span>
+            <span class="wk-tag wk-int" data-i18n="tag.intermediate">Intermediate</span>
+          </div>
+          <h3 class="wk-name" data-i18n="workouts.bench.name">Bench Press</h3>
+          <div class="wk-meta">
+            <span>4 × 8-10</span>
+            <span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+              45 min
+            </span>
+          </div>
+        </div>
+        <button class="wk-add" aria-label="Add Bench Press to workout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </article>
+
+      <article class="workout-card" data-category="back" role="listitem">
+        <div class="wk-visual wk-visual-green">
+          <svg viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <line x1="60" y1="15" x2="60" y2="75" stroke="#22C55E" stroke-width="3" stroke-linecap="round"/>
+            <path d="M40 30 Q60 45 80 30" stroke="#22C55E" stroke-width="2" fill="none"/>
+            <path d="M35 50 Q60 65 85 50" stroke="#22C55E" stroke-width="2" fill="none"/>
+            <circle cx="60" cy="15" r="8" fill="#22C55E" opacity="0.3" stroke="#22C55E" stroke-width="1.5"/>
+            <path d="M40 30 L30 45 M80 30 L90 45" stroke="#22C55E" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="wk-body">
+          <div class="wk-tags">
+            <span class="wk-tag wk-strength" data-i18n="tag.strength">Strength</span>
+            <span class="wk-tag wk-adv" data-i18n="tag.advanced">Advanced</span>
+          </div>
+          <h3 class="wk-name" data-i18n="workouts.deadlift.name">Deadlift</h3>
+          <div class="wk-meta">
+            <span>5 × 5</span>
+            <span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+              60 min
+            </span>
+          </div>
+        </div>
+        <button class="wk-add" aria-label="Add Deadlift to workout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </article>
+
+      <article class="workout-card" data-category="legs" role="listitem">
+        <div class="wk-visual wk-visual-purple">
+          <svg viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M50 20 L50 55 L42 80" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M70 20 L70 55 L78 80" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M45 20 L75 20" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M50 55 L70 55" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"/>
+            <rect x="30" y="38" width="60" height="8" rx="3" fill="#8B5CF6" opacity="0.2" stroke="#8B5CF6" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="wk-body">
+          <div class="wk-tags">
+            <span class="wk-tag wk-strength" data-i18n="tag.strength">Strength</span>
+            <span class="wk-tag wk-beg" data-i18n="tag.beginner">Beginner</span>
+          </div>
+          <h3 class="wk-name" data-i18n="workouts.squat.name">Back Squat</h3>
+          <div class="wk-meta">
+            <span>4 × 10</span>
+            <span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+              40 min
+            </span>
+          </div>
+        </div>
+        <button class="wk-add" aria-label="Add Back Squat to workout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </article>
+
+      <article class="workout-card" data-category="shoulders" role="listitem">
+        <div class="wk-visual wk-visual-orange">
+          <svg viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M40 55 L60 25 L80 55" stroke="#F97316" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="60" y1="55" x2="60" y2="78" stroke="#F97316" stroke-width="2.5" stroke-linecap="round"/>
+            <rect x="25" y="50" width="20" height="8" rx="3" fill="#F97316" opacity="0.4"/>
+            <rect x="75" y="50" width="20" height="8" rx="3" fill="#F97316" opacity="0.4"/>
+            <circle cx="60" cy="20" r="7" fill="#F97316" opacity="0.25" stroke="#F97316" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="wk-body">
+          <div class="wk-tags">
+            <span class="wk-tag wk-strength" data-i18n="tag.strength">Strength</span>
+            <span class="wk-tag wk-int" data-i18n="tag.intermediate">Intermediate</span>
+          </div>
+          <h3 class="wk-name" data-i18n="workouts.ohp.name">Overhead Press</h3>
+          <div class="wk-meta">
+            <span>4 × 8</span>
+            <span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+              35 min
+            </span>
+          </div>
+        </div>
+        <button class="wk-add" aria-label="Add Overhead Press to workout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </article>
+
+      <article class="workout-card" data-category="core" role="listitem">
+        <div class="wk-visual wk-visual-cyan">
+          <svg viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="60" cy="55" rx="30" ry="18" fill="none" stroke="#06B6D4" stroke-width="2" opacity="0.4"/>
+            <path d="M60 37 L60 25" stroke="#06B6D4" stroke-width="2" stroke-linecap="round"/>
+            <path d="M60 73 L60 80" stroke="#06B6D4" stroke-width="2" stroke-linecap="round"/>
+            <path d="M30 55 L18 55" stroke="#06B6D4" stroke-width="2" stroke-linecap="round"/>
+            <path d="M90 55 L102 55" stroke="#06B6D4" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="60" cy="55" r="8" fill="#06B6D4" opacity="0.3"/>
+          </svg>
+        </div>
+        <div class="wk-body">
+          <div class="wk-tags">
+            <span class="wk-tag wk-core" data-i18n="tag.core">Core</span>
+            <span class="wk-tag wk-beg" data-i18n="tag.beginner">Beginner</span>
+          </div>
+          <h3 class="wk-name" data-i18n="workouts.plank.name">Plank Circuit</h3>
+          <div class="wk-meta">
+            <span>3 × 60s</span>
+            <span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+              20 min
+            </span>
+          </div>
+        </div>
+        <button class="wk-add" aria-label="Add Plank Circuit to workout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </article>
+
+      <article class="workout-card" data-category="hiit" role="listitem">
+        <div class="wk-visual wk-visual-amber">
+          <svg viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M25 65 Q35 25 50 55 Q60 75 70 35 Q80 15 95 55" stroke="#FBBF24" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <circle cx="95" cy="55" r="5" fill="#FBBF24" opacity="0.8"/>
+            <line x1="15" y1="75" x2="105" y2="75" stroke="#FBBF24" stroke-width="1" opacity="0.3"/>
+          </svg>
+        </div>
+        <div class="wk-body">
+          <div class="wk-tags">
+            <span class="wk-tag wk-hiit" data-i18n="tag.hiit">HIIT</span>
+            <span class="wk-tag wk-adv" data-i18n="tag.advanced">Advanced</span>
+          </div>
+          <h3 class="wk-name" data-i18n="workouts.hiit.name">Tabata Blast</h3>
+          <div class="wk-meta">
+            <span>8 rounds</span>
+            <span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+              25 min
+            </span>
+          </div>
+        </div>
+        <button class="wk-add" aria-label="Add Tabata Blast to workout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </article>
+
+    </div>
+    <div class="text-center mt-s6">
+      <a href="#pricing" class="btn btn-secondary" data-i18n="workouts.viewall">View All 500+ Workouts</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ NUTRITION ══════════════════════════ -->
+<section class="section" id="nutrition" aria-label="Nutrition section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag" data-i18n="nutrition.tag">Nutrition Intelligence</span>
+      <h2 class="section-title"><span data-i18n="nutrition.title.prefix">Fuel Your</span> <span class="text-gradient" data-i18n="nutrition.title.suffix">Performance</span></h2>
+      <p class="section-sub" data-i18n="nutrition.sub">AI-powered meal planning that adapts to your training load, body composition goals, and food preferences.</p>
+    </div>
+
+    <div class="nutrition-layout">
+      <div class="nutrition-left">
+        <div class="macro-tracker" aria-label="Daily macro tracker">
+          <div class="macro-header">
+            <h3 data-i18n="nutrition.today">Today's Nutrition</h3>
+            <span class="macro-date">Apr 15</span>
+          </div>
+          <div class="macro-rings" aria-label="Macronutrient breakdown">
+            <div class="macro-ring-outer">
+              <svg width="140" height="140" viewBox="0 0 140 140" aria-label="Calorie ring 78%">
+                <circle cx="70" cy="70" r="60" fill="none" stroke="#1a1f2e" stroke-width="12"/>
+                <circle cx="70" cy="70" r="60" fill="none" stroke="url(#cal-grad)" stroke-width="12" stroke-dasharray="293 376" stroke-dashoffset="94" stroke-linecap="round"/>
+                <defs>
+                  <linearGradient id="cal-grad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#F97316"/>
+                    <stop offset="100%" stop-color="#FBBF24"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="macro-center">
+                <div class="macro-kcal">1,840</div>
+                <div class="macro-kcal-label" data-i18n="nutrition.kcal">kcal</div>
+                <div class="macro-kcal-goal">/ 2,350</div>
+              </div>
+            </div>
+          </div>
+          <div class="macro-bars">
+            <div class="macro-bar-item">
+              <div class="macro-bar-header">
+                <span class="macro-name" data-i18n="nutrition.protein">Protein</span>
+                <span class="macro-val">142g <span class="macro-goal">/ 180g</span></span>
+              </div>
+              <div class="macro-bar-track" role="progressbar" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100">
+                <div class="macro-bar-fill protein-fill" style="width:78%"></div>
+              </div>
+            </div>
+            <div class="macro-bar-item">
+              <div class="macro-bar-header">
+                <span class="macro-name" data-i18n="nutrition.carbs">Carbs</span>
+                <span class="macro-val">210g <span class="macro-goal">/ 250g</span></span>
+              </div>
+              <div class="macro-bar-track" role="progressbar" aria-valuenow="84" aria-valuemin="0" aria-valuemax="100">
+                <div class="macro-bar-fill carbs-fill" style="width:84%"></div>
+              </div>
+            </div>
+            <div class="macro-bar-item">
+              <div class="macro-bar-header">
+                <span class="macro-name" data-i18n="nutrition.fat">Fat</span>
+                <span class="macro-val">58g <span class="macro-goal">/ 72g</span></span>
+              </div>
+              <div class="macro-bar-track" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">
+                <div class="macro-bar-fill fat-fill" style="width:80%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nutrition-right">
+        <div class="meal-cards">
+          <div class="meal-card">
+            <div class="meal-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+            </div>
+            <div class="meal-info">
+              <div class="meal-time" data-i18n="nutrition.breakfast">Breakfast</div>
+              <div class="meal-name" data-i18n="nutrition.meal1">Oats + Protein Shake + Berries</div>
+            </div>
+            <div class="meal-kcal">480 kcal</div>
+          </div>
+          <div class="meal-card">
+            <div class="meal-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <div class="meal-info">
+              <div class="meal-time" data-i18n="nutrition.lunch">Lunch</div>
+              <div class="meal-name" data-i18n="nutrition.meal2">Grilled Chicken + Brown Rice + Broccoli</div>
+            </div>
+            <div class="meal-kcal">650 kcal</div>
+          </div>
+          <div class="meal-card">
+            <div class="meal-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </div>
+            <div class="meal-info">
+              <div class="meal-time" data-i18n="nutrition.dinner">Dinner</div>
+              <div class="meal-name" data-i18n="nutrition.meal3">Salmon + Sweet Potato + Asparagus</div>
+            </div>
+            <div class="meal-kcal">720 kcal</div>
+          </div>
+          <div class="meal-card meal-snack">
+            <div class="meal-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
+            </div>
+            <div class="meal-info">
+              <div class="meal-time" data-i18n="nutrition.snack">Snack</div>
+              <div class="meal-name" data-i18n="nutrition.meal4">Greek Yogurt + Almonds + Honey</div>
+            </div>
+            <div class="meal-kcal">280 kcal</div>
+          </div>
+        </div>
+        <div class="hydration-bar" aria-label="Hydration tracker">
+          <div class="hydration-header">
+            <span data-i18n="nutrition.water">Hydration</span>
+            <span class="hydration-val">1.8 / 3L</span>
+          </div>
+          <div class="water-cups" role="group" aria-label="Water cups drank">
+            <div class="water-cup filled" aria-label="Cup 1 drank" tabindex="0"></div>
+            <div class="water-cup filled" aria-label="Cup 2 drank" tabindex="0"></div>
+            <div class="water-cup filled" aria-label="Cup 3 drank" tabindex="0"></div>
+            <div class="water-cup filled" aria-label="Cup 4 drank" tabindex="0"></div>
+            <div class="water-cup filled" aria-label="Cup 5 drank" tabindex="0"></div>
+            <div class="water-cup filled" aria-label="Cup 6 drank" tabindex="0"></div>
+            <div class="water-cup" aria-label="Cup 7 not yet" tabindex="0"></div>
+            <div class="water-cup" aria-label="Cup 8 not yet" tabindex="0"></div>
+            <div class="water-cup" aria-label="Cup 9 not yet" tabindex="0"></div>
+            <div class="water-cup" aria-label="Cup 10 not yet" tabindex="0"></div>
+            <div class="water-cup" aria-label="Cup 11 not yet" tabindex="0"></div>
+            <div class="water-cup" aria-label="Cup 12 not yet" tabindex="0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ PROGRESS ══════════════════════════ -->
+<section class="section section-alt" id="progress" aria-label="Progress tracking">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag" data-i18n="progress.tag">Progress Tracking</span>
+      <h2 class="section-title"><span data-i18n="progress.title.prefix">See Every</span> <span class="text-gradient" data-i18n="progress.title.suffix">Gain</span></h2>
+      <p class="section-sub" data-i18n="progress.sub">Comprehensive analytics that show your strength gains, body composition changes, and performance improvements over time.</p>
+    </div>
+
+    <div class="progress-layout">
+      <div class="progress-chart-card" aria-label="Strength progress chart">
+        <div class="chart-header">
+          <h3 data-i18n="progress.strength">Strength Progress</h3>
+          <div class="chart-period-btns" role="group" aria-label="Chart time period">
+            <button class="period-btn active">1M</button>
+            <button class="period-btn">3M</button>
+            <button class="period-btn">6M</button>
+            <button class="period-btn">1Y</button>
+          </div>
+        </div>
+        <div class="chart-canvas" aria-label="Line chart showing strength progress">
+          <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Strength progress over time">
+            <defs>
+              <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#F97316" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#F97316" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="chart-grad2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#22C55E" stop-opacity="0.2"/>
+                <stop offset="100%" stop-color="#22C55E" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="40" y1="20" x2="490" y2="20" stroke="#1e2535" stroke-width="1"/>
+            <line x1="40" y1="60" x2="490" y2="60" stroke="#1e2535" stroke-width="1"/>
+            <line x1="40" y1="100" x2="490" y2="100" stroke="#1e2535" stroke-width="1"/>
+            <line x1="40" y1="140" x2="490" y2="140" stroke="#1e2535" stroke-width="1"/>
+            <line x1="40" y1="180" x2="490" y2="180" stroke="#1e2535" stroke-width="1"/>
+            <!-- Y labels -->
+            <text x="30" y="24" fill="#4e5869" font-size="10" text-anchor="end">120</text>
+            <text x="30" y="64" fill="#4e5869" font-size="10" text-anchor="end">100</text>
+            <text x="30" y="104" fill="#4e5869" font-size="10" text-anchor="end">80</text>
+            <text x="30" y="144" fill="#4e5869" font-size="10" text-anchor="end">60</text>
+            <text x="30" y="184" fill="#4e5869" font-size="10" text-anchor="end">40</text>
+            <!-- Squat area fill -->
+            <path d="M40 160 L115 140 L190 120 L265 100 L340 80 L415 65 L490 50 L490 180 L40 180 Z" fill="url(#chart-grad)"/>
+            <!-- Squat line -->
+            <path d="M40 160 L115 140 L190 120 L265 100 L340 80 L415 65 L490 50" stroke="#F97316" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Bench area fill -->
+            <path d="M40 175 L115 165 L190 150 L265 138 L340 125 L415 112 L490 100 L490 180 L40 180 Z" fill="url(#chart-grad2)"/>
+            <!-- Bench line -->
+            <path d="M40 175 L115 165 L190 150 L265 138 L340 125 L415 112 L490 100" stroke="#22C55E" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Data points -->
+            <circle cx="490" cy="50" r="4" fill="#F97316"/>
+            <circle cx="490" cy="100" r="4" fill="#22C55E"/>
+            <!-- X labels -->
+            <text x="40" y="198" fill="#4e5869" font-size="9" text-anchor="middle">Week 1</text>
+            <text x="115" y="198" fill="#4e5869" font-size="9" text-anchor="middle">Week 2</text>
+            <text x="190" y="198" fill="#4e5869" font-size="9" text-anchor="middle">Week 3</text>
+            <text x="265" y="198" fill="#4e5869" font-size="9" text-anchor="middle">Week 4</text>
+            <text x="340" y="198" fill="#4e5869" font-size="9" text-anchor="middle">Week 5</text>
+            <text x="415" y="198" fill="#4e5869" font-size="9" text-anchor="middle">Week 6</text>
+            <text x="490" y="198" fill="#4e5869" font-size="9" text-anchor="middle">Week 7</text>
+          </svg>
+          <div class="chart-legend" aria-label="Chart legend">
+            <span class="legend-item"><span class="legend-dot" style="background:#F97316"></span> Squat (kg)</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#22C55E"></span> Bench (kg)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-side">
+        <div class="progress-stat-card">
+          <div class="pstat-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg>
+          </div>
+          <div class="pstat-content">
+            <div class="pstat-val">+24 kg</div>
+            <div class="pstat-label" data-i18n="progress.squat">Squat 1RM gain</div>
+          </div>
+          <span class="pstat-badge up" aria-label="Improved">+18%</span>
+        </div>
+        <div class="progress-stat-card">
+          <div class="pstat-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="pstat-content">
+            <div class="pstat-val">47 VO₂</div>
+            <div class="pstat-label" data-i18n="progress.vo2">VO₂ Max</div>
+          </div>
+          <span class="pstat-badge up" aria-label="Improved">+5%</span>
+        </div>
+        <div class="progress-stat-card">
+          <div class="pstat-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </div>
+          <div class="pstat-content">
+            <div class="pstat-val">58 bpm</div>
+            <div class="pstat-label" data-i18n="progress.rhr">Resting HR</div>
+          </div>
+          <span class="pstat-badge down" aria-label="Decreased (improvement)">-8%</span>
+        </div>
+        <div class="progress-stat-card">
+          <div class="pstat-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+          </div>
+          <div class="pstat-content">
+            <div class="pstat-val">42 days</div>
+            <div class="pstat-label" data-i18n="progress.streak">Streak</div>
+          </div>
+          <span class="pstat-badge fire" aria-label="On fire">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#F97316"><path d="M12 2c0 0-5 5-5 10a5 5 0 0010 0c0-5-5-10-5-10z"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ FEATURES ══════════════════════════ -->
+<section class="section" id="features" aria-label="Platform features">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag" data-i18n="features.tag">Why V Fitness</span>
+      <h2 class="section-title"><span data-i18n="features.title.prefix">Everything You</span> <span class="text-gradient" data-i18n="features.title.suffix">Need</span></h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon fi-orange" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <h3 class="feature-title" data-i18n="features.ai.title">AI Coaching</h3>
+        <p class="feature-desc" data-i18n="features.ai.desc">Real-time form feedback, adaptive load recommendations, and personalized weekly plans powered by machine learning.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-green" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg>
+        </div>
+        <h3 class="feature-title" data-i18n="features.progress.title">Smart Progress</h3>
+        <p class="feature-desc" data-i18n="features.progress.desc">Automated progressive overload, 1RM tracking, volume analysis, and weekly performance summaries.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-purple" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        </div>
+        <h3 class="feature-title" data-i18n="features.community.title">Community</h3>
+        <p class="feature-desc" data-i18n="features.community.desc">Monthly challenges, leaderboards, workout sharing, and a global community of 50K+ athletes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-cyan" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .21h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        </div>
+        <h3 class="feature-title" data-i18n="features.support.title">24/7 Support</h3>
+        <p class="feature-desc" data-i18n="features.support.desc">Live chat, certified coach access, and an AI assistant that answers your questions any time, any day.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-amber" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </div>
+        <h3 class="feature-title" data-i18n="features.offline.title">Offline Mode</h3>
+        <p class="feature-desc" data-i18n="features.offline.desc">Download workouts and train anywhere — gym, home, or travel — with no internet connection required.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-red" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+        </div>
+        <h3 class="feature-title" data-i18n="features.wearable.title">Wearable Sync</h3>
+        <p class="feature-desc" data-i18n="features.wearable.desc">Seamless sync with Apple Watch, Garmin, Whoop, and Polar devices for heart rate and recovery data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ TESTIMONIALS ══════════════════════════ -->
+<section class="section section-alt" id="testimonials" aria-label="User testimonials">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag" data-i18n="testimonials.tag">Success Stories</span>
+      <h2 class="section-title"><span data-i18n="testimonials.title.prefix">Real Results.</span> <span class="text-gradient" data-i18n="testimonials.title.suffix">Real People.</span></h2>
+    </div>
+    <div class="testimonials-grid">
+      <blockquote class="testimonial-card">
+        <div class="testi-stars" aria-label="5 stars">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+        </div>
+        <p class="testi-text" data-i18n="testimonials.1.text">"I went from 0 to squatting 120kg in 6 months. The progressive overload system is unlike anything I've tried — it just works."</p>
+        <footer class="testi-author">
+          <div class="testi-avatar testi-av1" aria-hidden="true"></div>
+          <div>
+            <div class="testi-name">Marcus L.</div>
+            <div class="testi-meta" data-i18n="testimonials.1.meta">+52kg squat · 6 months</div>
+          </div>
+        </footer>
+      </blockquote>
+      <blockquote class="testimonial-card testi-featured">
+        <div class="testi-stars" aria-label="5 stars">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+        </div>
+        <p class="testi-text" data-i18n="testimonials.2.text">"As a competitive runner, I needed something beyond generic plans. V Fitness's AI coach adapted my training weekly based on my Garmin data. Dropped my 10K time by 4 minutes."</p>
+        <footer class="testi-author">
+          <div class="testi-avatar testi-av2" aria-hidden="true"></div>
+          <div>
+            <div class="testi-name">Aino K.</div>
+            <div class="testi-meta" data-i18n="testimonials.2.meta">-4 min 10K · Competitive runner</div>
+          </div>
+        </footer>
+      </blockquote>
+      <blockquote class="testimonial-card">
+        <div class="testi-stars" aria-label="5 stars">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F97316" aria-hidden="true"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+        </div>
+        <p class="testi-text" data-i18n="testimonials.3.text">"Started completely from scratch at 45. The beginner programs were so well structured, I never felt lost or overwhelmed. Lost 14kg in 4 months."</p>
+        <footer class="testi-author">
+          <div class="testi-avatar testi-av3" aria-hidden="true"></div>
+          <div>
+            <div class="testi-name">Juhani V.</div>
+            <div class="testi-meta" data-i18n="testimonials.3.meta">-14kg · Beginner to fitness</div>
+          </div>
+        </footer>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ PRICING ══════════════════════════ -->
+<section class="section" id="pricing" aria-label="Pricing plans">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag" data-i18n="pricing.tag">Pricing</span>
+      <h2 class="section-title"><span data-i18n="pricing.title.prefix">Simple,</span> <span class="text-gradient" data-i18n="pricing.title.middle">Transparent</span> <span data-i18n="pricing.title.suffix">Pricing</span></h2>
+      <p class="section-sub" data-i18n="pricing.sub">Start free. Upgrade when you're ready. Cancel anytime.</p>
+      <div class="billing-toggle" role="group" aria-label="Billing period">
+        <button class="billing-btn active" id="billing-monthly" data-i18n="pricing.monthly">Monthly</button>
+        <button class="billing-btn" id="billing-annual"><span data-i18n="pricing.annual">Annual</span> <span class="save-badge">Save 40%</span></button>
+      </div>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-header">
+          <div class="plan-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8d96aa" stroke-width="2"><path d="M12 22V12M12 12L8 16M12 12L16 16"/><circle cx="12" cy="6" r="3"/></svg>
+          </div>
+          <h3 class="plan-name" data-i18n="pricing.free.name">Starter</h3>
+          <div class="plan-price">
+            <span class="price-val">€0</span>
+            <span class="price-per" data-i18n="pricing.permonth">/ month</span>
+          </div>
+          <p class="plan-desc" data-i18n="pricing.free.desc">Perfect to explore V Fitness and start your journey.</p>
+        </div>
+        <ul class="plan-features" aria-label="Starter plan features">
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.free.f1">50 free workouts</span>
+          </li>
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.free.f2">3 beginner programs</span>
+          </li>
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.free.f3">Basic progress tracking</span>
+          </li>
+          <li class="plan-feat plan-feat-off">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4e5869" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span data-i18n="pricing.free.f4">AI Coach</span>
+          </li>
+          <li class="plan-feat plan-feat-off">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4e5869" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span data-i18n="pricing.free.f5">Nutrition plans</span>
+          </li>
+        </ul>
+        <a href="#" class="btn btn-secondary w-full" data-i18n="pricing.free.cta">Get Started Free</a>
+      </div>
+
+      <div class="pricing-card pricing-popular" aria-label="Most popular plan">
+        <div class="popular-badge" data-i18n="pricing.popular">Most Popular</div>
+        <div class="pricing-header">
+          <div class="plan-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          </div>
+          <h3 class="plan-name" data-i18n="pricing.pro.name">Pro</h3>
+          <div class="plan-price">
+            <span class="price-val" id="pro-price">€14.90</span>
+            <span class="price-per" data-i18n="pricing.permonth">/ month</span>
+          </div>
+          <p class="plan-desc" data-i18n="pricing.pro.desc">For serious athletes who want the complete V Fitness experience.</p>
+        </div>
+        <ul class="plan-features" aria-label="Pro plan features">
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.pro.f1">500+ workouts unlocked</span>
+          </li>
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.pro.f2">All 120+ programs</span>
+          </li>
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.pro.f3">AI Coach (unlimited)</span>
+          </li>
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.pro.f4">Full nutrition plans</span>
+          </li>
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.pro.f5">Wearable sync</span>
+          </li>
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.pro.f6">Offline downloads</span>
+          </li>
+        </ul>
+        <a href="#" class="btn btn-primary w-full" data-i18n="pricing.pro.cta">Start 7-Day Free Trial</a>
+      </div>
+
+      <div class="pricing-card">
+        <div class="pricing-header">
+          <div class="plan-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>
+          </div>
+          <h3 class="plan-name" data-i18n="pricing.elite.name">Elite</h3>
+          <div class="plan-price">
+            <span class="price-val" id="elite-price">€29.90</span>
+            <span class="price-per" data-i18n="pricing.permonth">/ month</span>
+          </div>
+          <p class="plan-desc" data-i18n="pricing.elite.desc">For competitive athletes who need a dedicated coach and elite-level data analysis.</p>
+        </div>
+        <ul class="plan-features" aria-label="Elite plan features">
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.elite.f1">Everything in Pro</span>
+          </li>
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.elite.f2">1-on-1 certified coach</span>
+          </li>
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.elite.f3">Weekly video check-ins</span>
+          </li>
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.elite.f4">Advanced body composition</span>
+          </li>
+          <li class="plan-feat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" aria-hidden="true"><polyline points="20,6 9,17 4,12"/></svg>
+            <span data-i18n="pricing.elite.f5">Custom program builder</span>
+          </li>
+        </ul>
+        <a href="#" class="btn btn-ghost w-full btn-purple" data-i18n="pricing.elite.cta">Go Elite</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ CTA BAND ══════════════════════════ -->
+<section class="cta-band" aria-label="Final call to action">
+  <div class="cta-band-bg" aria-hidden="true">
+    <div class="cta-orb cta-orb-1"></div>
+    <div class="cta-orb cta-orb-2"></div>
+  </div>
+  <div class="container cta-inner">
+    <h2 class="cta-title"><span data-i18n="cta.title.prefix">Start Your Transformation</span> <span class="text-gradient" data-i18n="cta.title.suffix">Today</span></h2>
+    <p class="cta-sub" data-i18n="cta.sub">Join 50,000+ athletes who are already training smarter with V Fitness. No credit card required.</p>
+    <div class="cta-btns">
+      <a href="#pricing" class="btn btn-primary btn-lg" data-i18n="cta.btn1">Start Free Today</a>
+      <a href="#programs" class="btn btn-ghost btn-lg" data-i18n="cta.btn2">Browse Programs</a>
+    </div>
+    <div class="cta-logos" aria-label="Available on">
+      <span class="cta-logo-label" data-i18n="cta.available">Available on</span>
+      <div class="store-badges">
+        <div class="store-badge" role="img" aria-label="App Store">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          App Store
+        </div>
+        <div class="store-badge" role="img" aria-label="Google Play">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l14 8.5c.6.37.6 1.23 0 1.6l-14 8.5c-.66.5-1.6.03-1.6-.8z"/></svg>
+          Google Play
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ FOOTER ══════════════════════════ -->
+<footer class="footer" role="contentinfo">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo" aria-label="V Fitness home">
+        <span class="logo-text">V <span class="logo-accent">FITNESS</span></span>
+      </a>
+      <p class="footer-tagline" data-i18n="footer.tagline">Science-backed training for every athlete.</p>
+      <div class="footer-social" aria-label="Social media links">
+        <a href="#" class="social-link" aria-label="Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+        </a>
+        <a href="#" class="social-link" aria-label="TikTok">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg>
+        </a>
+        <a href="#" class="social-link" aria-label="YouTube">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75,15.02 15.5,12 9.75,8.98 9.75,15.02" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="#" class="social-link" aria-label="X / Twitter">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <nav class="footer-links" aria-label="Footer navigation">
+      <div class="footer-col">
+        <h4 class="footer-col-title" data-i18n="footer.product">Product</h4>
+        <a href="#programs" class="footer-link" data-i18n="nav.programs">Programs</a>
+        <a href="#workouts" class="footer-link" data-i18n="nav.workouts">Workouts</a>
+        <a href="#nutrition" class="footer-link" data-i18n="nav.nutrition">Nutrition</a>
+        <a href="#progress" class="footer-link" data-i18n="nav.progress">Progress</a>
+        <a href="#pricing" class="footer-link" data-i18n="nav.pricing">Pricing</a>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title" data-i18n="footer.training">Training</h4>
+        <a href="#" class="footer-link" data-i18n="footer.strength">Strength</a>
+        <a href="#" class="footer-link" data-i18n="footer.cardio">Cardio</a>
+        <a href="#" class="footer-link" data-i18n="footer.mobility">Mobility</a>
+        <a href="#" class="footer-link" data-i18n="footer.hiit">HIIT</a>
+        <a href="#" class="footer-link" data-i18n="footer.yoga">Yoga & Recovery</a>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title" data-i18n="footer.company">Company</h4>
+        <a href="#" class="footer-link" data-i18n="footer.about">About Us</a>
+        <a href="#" class="footer-link" data-i18n="footer.blog">Blog</a>
+        <a href="#" class="footer-link" data-i18n="footer.careers">Careers</a>
+        <a href="#" class="footer-link" data-i18n="footer.press">Press</a>
+        <a href="#" class="footer-link" data-i18n="footer.contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title" data-i18n="footer.legal">Legal</h4>
+        <a href="#" class="footer-link" data-i18n="footer.privacy">Privacy Policy</a>
+        <a href="#" class="footer-link" data-i18n="footer.terms">Terms of Service</a>
+        <a href="#" class="footer-link" data-i18n="footer.cookies">Cookie Policy</a>
+        <a href="#" class="footer-link" data-i18n="footer.gdpr">GDPR</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <p class="footer-copy" data-i18n="footer.copy">© 2026 V Fitness. All rights reserved.</p>
+      <p class="footer-copy footer-location" data-i18n="footer.location">Made with passion in Finland & beyond.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════ AUTH MODAL ══════════════════════════ -->
+<div id="auth-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Authentication" style="display:none">
+  <div class="modal-card auth-modal-card">
+    <button class="modal-close" id="auth-modal-close" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="auth-logo">
+      <span class="logo-text">V <span class="logo-accent">FITNESS</span></span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab active" id="tab-login" role="tab" aria-selected="true" aria-controls="panel-login" data-i18n="auth.login">Log In</button>
+      <button class="auth-tab" id="tab-signup" role="tab" aria-selected="false" aria-controls="panel-signup" data-i18n="auth.signup">Sign Up</button>
+    </div>
+
+    <!-- Login Panel -->
+    <div id="panel-login" role="tabpanel" aria-labelledby="tab-login">
+      <p class="auth-welcome" data-i18n="auth.welcome.login">Welcome back. Let's get to work.</p>
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="login-email" data-i18n="auth.email">Email</label>
+          <input class="form-input" type="email" id="login-email" name="email" autocomplete="email" required placeholder="you@example.com" aria-required="true"/>
+          <span class="form-error" id="login-email-err" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password" data-i18n="auth.password">Password</label>
+          <div class="input-password-wrap">
+            <input class="form-input" type="password" id="login-password" name="password" autocomplete="current-password" required placeholder="••••••••" aria-required="true"/>
+            <button type="button" class="toggle-pw" data-target="login-password" aria-label="Toggle password visibility">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <span class="form-error" id="login-pw-err" role="alert"></span>
+        </div>
+        <div class="form-forgot"><a href="#" class="auth-link" data-i18n="auth.forgot">Forgot password?</a></div>
+        <button type="submit" class="btn btn-primary w-full btn-auth-submit" id="login-submit" data-i18n="auth.login.btn">
+          <span class="btn-text">Log In</span>
+          <span class="btn-spinner" style="display:none" aria-hidden="true"></span>
+        </button>
+        <p class="auth-error" id="login-error" role="alert"></p>
+      </form>
+    </div>
+
+    <!-- Signup Panel -->
+    <div id="panel-signup" role="tabpanel" aria-labelledby="tab-signup" style="display:none">
+      <p class="auth-welcome" data-i18n="auth.welcome.signup">Join 50,000+ athletes. Start free.</p>
+      <form id="signup-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="signup-fname" data-i18n="auth.firstname">First Name</label>
+            <input class="form-input" type="text" id="signup-fname" autocomplete="given-name" required placeholder="Alex" aria-required="true"/>
+            <span class="form-error" id="signup-fname-err" role="alert"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-lname" data-i18n="auth.lastname">Last Name</label>
+            <input class="form-input" type="text" id="signup-lname" autocomplete="family-name" required placeholder="Johnson" aria-required="true"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signup-email" data-i18n="auth.email">Email</label>
+          <input class="form-input" type="email" id="signup-email" autocomplete="email" required placeholder="you@example.com" aria-required="true"/>
+          <span class="form-error" id="signup-email-err" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signup-password" data-i18n="auth.password">Password</label>
+          <div class="input-password-wrap">
+            <input class="form-input" type="password" id="signup-password" autocomplete="new-password" required placeholder="Min. 8 characters" aria-required="true"/>
+            <button type="button" class="toggle-pw" data-target="signup-password" aria-label="Toggle password visibility">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="pw-strength" id="pw-strength" aria-label="Password strength">
+            <div class="pw-strength-bar" id="pw-strength-bar"></div>
+          </div>
+          <span class="form-error" id="signup-pw-err" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signup-level" data-i18n="auth.level">Fitness Level</label>
+          <select class="form-input form-select" id="signup-level">
+            <option value="beginner" data-i18n="level.beginner">Beginner</option>
+            <option value="intermediate" data-i18n="level.intermediate">Intermediate</option>
+            <option value="advanced" data-i18n="level.advanced">Advanced</option>
+            <option value="elite" data-i18n="level.elite">Elite</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="auth.goal">Primary Goal</label>
+          <div class="goal-chips" role="group" aria-label="Select primary goal">
+            <label class="goal-chip"><input type="radio" name="goal" value="strength" checked/><span data-i18n="auth.goal.strength">Strength</span></label>
+            <label class="goal-chip"><input type="radio" name="goal" value="weight_loss"/><span data-i18n="auth.goal.loss">Weight Loss</span></label>
+            <label class="goal-chip"><input type="radio" name="goal" value="muscle_gain"/><span data-i18n="auth.goal.muscle">Muscle Gain</span></label>
+            <label class="goal-chip"><input type="radio" name="goal" value="endurance"/><span data-i18n="auth.goal.endurance">Endurance</span></label>
+            <label class="goal-chip"><input type="radio" name="goal" value="mobility"/><span data-i18n="auth.goal.mobility">Mobility</span></label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-full btn-auth-submit" id="signup-submit" data-i18n="auth.signup.btn">
+          <span class="btn-text">Create Account</span>
+          <span class="btn-spinner" style="display:none" aria-hidden="true"></span>
+        </button>
+        <p class="auth-error" id="signup-error" role="alert"></p>
+        <p class="auth-terms" data-i18n="auth.terms">By signing up you agree to our <a href="#" class="auth-link">Terms</a> and <a href="#" class="auth-link">Privacy Policy</a>.</p>
+      </form>
+    </div>
+
+    <!-- Success state -->
+    <div id="auth-success" style="display:none" class="auth-success-state">
+      <div class="success-icon" aria-hidden="true">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+      </div>
+      <h3 id="auth-success-title">Check your email</h3>
+      <p id="auth-success-msg">We sent a confirmation link. Click it to activate your account.</p>
+    </div>
+
+    <!-- ── Guest / Demo access ── -->
+    <div class="auth-divider" aria-hidden="true">
+      <span data-i18n="auth.or">or</span>
+    </div>
+    <button class="btn-guest" id="btn-guest-login" aria-label="Continue as guest">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <span data-i18n="auth.guest">Continue as Guest</span>
+      <span class="guest-badge" data-i18n="auth.guest.badge">No account needed</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════ DASHBOARD ══════════════════════════ -->
+<div id="dashboard-overlay" class="dashboard-overlay" role="main" aria-label="User Dashboard" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="db-sidebar" id="db-sidebar" role="navigation" aria-label="Dashboard navigation">
+    <div class="db-sidebar-top">
+      <a href="#" class="nav-logo db-logo" id="db-close-btn" aria-label="Back to site">
+        <span class="logo-text" style="font-size:1rem">V <span class="logo-accent">FITNESS</span></span>
+      </a>
+
+      <div class="db-profile-card" aria-label="User profile summary">
+        <div class="db-avatar-lg" id="db-avatar-lg" aria-hidden="true"></div>
+        <div class="db-profile-info">
+          <div class="db-profile-name" id="db-profile-name">Loading…</div>
+          <div class="db-profile-level-badge" id="db-profile-level">beginner</div>
+        </div>
+        <div class="db-plan-pill" id="db-plan-pill">FREE</div>
+      </div>
+
+      <nav class="db-nav" role="list">
+        <button class="db-nav-item active" data-panel="overview" role="listitem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span data-i18n="db.overview">Overview</span>
+        </button>
+        <button class="db-nav-item" data-panel="programs" role="listitem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v2H4zm0 7h16v2H4zm0 7h16v2H4z"/></svg>
+          <span data-i18n="db.programs">My Programs</span>
+        </button>
+        <button class="db-nav-item" data-panel="workouts" role="listitem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 4v6a6 6 0 0012 0V4"/><line x1="6" y1="20" x2="18" y2="20"/></svg>
+          <span data-i18n="db.workouts">Workouts</span>
+        </button>
+        <button class="db-nav-item" data-panel="nutrition" role="listitem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+          <span data-i18n="db.nutrition">Nutrition</span>
+        </button>
+        <button class="db-nav-item" data-panel="progress" role="listitem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/></svg>
+          <span data-i18n="db.progress">Progress</span>
+        </button>
+        <button class="db-nav-item" data-panel="body" role="listitem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="5" r="3"/><path d="M12 8v8m-4 4h8"/><path d="M8 12l-4 8m16-8l-4 8"/></svg>
+          <span data-i18n="db.body">Body Stats</span>
+        </button>
+        <button class="db-nav-item" data-panel="settings" role="listitem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span data-i18n="db.settings">Settings</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="db-sidebar-bottom">
+      <button class="db-logout-btn" id="db-logout-btn" aria-label="Log out">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span data-i18n="db.logout">Log Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="db-main" id="db-main">
+
+    <!-- Mobile topbar -->
+    <div class="db-topbar">
+      <button class="db-menu-toggle" id="db-menu-toggle" aria-label="Toggle sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="db-topbar-title" id="db-topbar-title">Overview</span>
+      <button class="db-close-mobile" id="db-close-mobile" aria-label="Close dashboard">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- ── OVERVIEW PANEL ── -->
+    <section class="db-panel active" id="panel-overview" aria-label="Overview">
+      <div class="db-panel-header">
+        <div>
+          <h2 class="db-panel-title" data-i18n="db.overview.title">Overview</h2>
+          <p class="db-panel-sub" id="db-greeting">Good morning!</p>
+        </div>
+        <div class="db-date-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="db-today-date"></span>
+        </div>
+      </div>
+
+      <!-- Quick stats -->
+      <div class="db-stats-row" role="list" aria-label="Quick statistics">
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-orange" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c0 0-5 5-5 10a5 5 0 0010 0c0-5-5-10-5-10z"/></svg>
+          </div>
+          <div class="db-stat-body">
+            <div class="db-stat-val" id="ov-streak">–</div>
+            <div class="db-stat-label" data-i18n="db.streak">Day Streak</div>
+          </div>
+        </div>
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-green" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4v6a6 6 0 0012 0V4"/></svg>
+          </div>
+          <div class="db-stat-body">
+            <div class="db-stat-val" id="ov-total-workouts">–</div>
+            <div class="db-stat-label" data-i18n="db.totalWorkouts">Total Workouts</div>
+          </div>
+        </div>
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-purple" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/></svg>
+          </div>
+          <div class="db-stat-body">
+            <div class="db-stat-val" id="ov-this-week">–</div>
+            <div class="db-stat-label" data-i18n="db.thisWeek">This Week</div>
+          </div>
+        </div>
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-cyan" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+          </div>
+          <div class="db-stat-body">
+            <div class="db-stat-val" id="ov-hours">–</div>
+            <div class="db-stat-label" data-i18n="db.totalHours">Total Hours</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly activity chart + Today's plan -->
+      <div class="db-two-col">
+        <div class="db-card">
+          <div class="db-card-header">
+            <h3 data-i18n="db.weekly">Weekly Activity</h3>
+            <span class="db-card-meta" id="ov-week-label">This week</span>
+          </div>
+          <div class="db-weekly-chart" aria-label="Weekly workout activity bar chart" role="img">
+            <div class="weekly-bars" id="weekly-bars">
+              <!-- Injected by JS -->
+            </div>
+            <div class="weekly-days" id="weekly-days">
+              <!-- Injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="db-card">
+          <div class="db-card-header">
+            <h3 data-i18n="db.todays.plan">Today's Plan</h3>
+            <span class="db-card-badge" data-i18n="db.active">Active</span>
+          </div>
+          <div class="db-today-plan" id="db-today-plan">
+            <div class="today-program-item">
+              <div class="tpi-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"><path d="M6 4v6a6 6 0 0012 0V4"/><line x1="6" y1="20" x2="18" y2="20"/></svg>
+              </div>
+              <div class="tpi-info">
+                <div class="tpi-name">Upper Body Power</div>
+                <div class="tpi-meta">6 exercises · 45 min</div>
+              </div>
+              <button class="tpi-start-btn btn btn-primary" style="padding:0.4rem 1rem;font-size:0.8rem" data-i18n="db.start">Start</button>
+            </div>
+            <div class="today-program-item">
+              <div class="tpi-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+              </div>
+              <div class="tpi-info">
+                <div class="tpi-name">Nutrition Log</div>
+                <div class="tpi-meta">Target: 2,350 kcal</div>
+              </div>
+              <button class="tpi-start-btn btn btn-ghost" style="padding:0.4rem 1rem;font-size:0.8rem;border-color:rgba(34,197,94,0.3);color:#22C55E" data-i18n="db.log">Log</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent workouts -->
+      <div class="db-card">
+        <div class="db-card-header">
+          <h3 data-i18n="db.recent">Recent Workouts</h3>
+          <button class="db-link-btn" data-switch-panel="workouts" data-i18n="db.viewall">View All</button>
+        </div>
+        <div id="recent-workouts-list" class="recent-workouts-list">
+          <div class="db-empty-state" data-i18n="db.no.workouts">No workouts logged yet. Start your first session!</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PROGRAMS PANEL ── -->
+    <section class="db-panel" id="panel-programs" style="display:none" aria-label="My Programs">
+      <div class="db-panel-header">
+        <h2 class="db-panel-title" data-i18n="db.programs.title">My Programs</h2>
+      </div>
+      <div id="programs-list" class="programs-list">
+        <div class="db-empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4e5869" stroke-width="1.5" aria-hidden="true"><path d="M4 4h16v2H4zm0 7h16v2H4zm0 7h16v2H4z"/></svg>
+          <p data-i18n="db.no.programs">No active programs. Browse programs to get started.</p>
+          <a href="#programs" class="btn btn-primary" onclick="closeDashboard()" data-i18n="db.browse.programs">Browse Programs</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── WORKOUTS PANEL ── -->
+    <section class="db-panel" id="panel-workouts" style="display:none" aria-label="Workout Log">
+      <div class="db-panel-header">
+        <h2 class="db-panel-title" data-i18n="db.workouts.title">Workout Log</h2>
+        <button class="btn btn-primary" id="log-workout-btn" style="padding:0.6rem 1.25rem;font-size:0.875rem" data-i18n="db.log.workout">Log Workout</button>
+      </div>
+
+      <!-- Log workout form (hidden by default) -->
+      <div class="db-card log-form-card" id="log-workout-form" style="display:none">
+        <h3 data-i18n="db.log.new">Log New Workout</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" data-i18n="db.exercise">Exercise</label>
+            <input class="form-input" type="text" id="log-exercise" placeholder="e.g. Bench Press"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="db.category">Category</label>
+            <select class="form-input form-select" id="log-category">
+              <option value="strength">Strength</option>
+              <option value="cardio">Cardio</option>
+              <option value="hiit">HIIT</option>
+              <option value="mobility">Mobility</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" data-i18n="db.sets">Sets</label>
+            <input class="form-input" type="number" id="log-sets" placeholder="4" min="1" max="20"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="db.reps">Reps</label>
+            <input class="form-input" type="number" id="log-reps" placeholder="10" min="1" max="200"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="db.weight">Weight (kg)</label>
+            <input class="form-input" type="number" id="log-weight" placeholder="80" min="0"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="db.duration">Duration (min)</label>
+            <input class="form-input" type="number" id="log-duration" placeholder="45" min="1"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="db.notes">Notes</label>
+          <textarea class="form-input" id="log-notes" rows="2" placeholder="How did it feel?"></textarea>
+        </div>
+        <div style="display:flex;gap:1rem;margin-top:1rem">
+          <button class="btn btn-primary" id="log-submit-btn" data-i18n="db.save">Save Workout</button>
+          <button class="btn btn-secondary" id="log-cancel-btn" data-i18n="db.cancel">Cancel</button>
+        </div>
+        <p class="auth-error" id="log-error" role="alert"></p>
+      </div>
+
+      <div id="all-workouts-list" class="recent-workouts-list">
+        <div class="db-empty-state" data-i18n="db.no.workouts">No workouts logged yet. Start your first session!</div>
+      </div>
+    </section>
+
+    <!-- ── NUTRITION PANEL ── -->
+    <section class="db-panel" id="panel-nutrition" style="display:none" aria-label="Nutrition">
+      <div class="db-panel-header">
+        <h2 class="db-panel-title" data-i18n="db.nutrition.title">Nutrition</h2>
+        <div class="db-date-badge" id="nutrition-date"></div>
+      </div>
+      <div class="db-two-col">
+        <div class="db-card">
+          <div class="db-card-header"><h3 data-i18n="db.macros">Daily Macros</h3></div>
+          <div style="display:flex;justify-content:center;padding:1rem 0">
+            <div class="macro-ring-outer">
+              <svg width="150" height="150" viewBox="0 0 150 150">
+                <circle cx="75" cy="75" r="62" fill="none" stroke="#1a1f2e" stroke-width="14"/>
+                <circle cx="75" cy="75" r="62" fill="none" stroke="url(#db-cal-grad)" stroke-width="14" stroke-dasharray="310 389" stroke-dashoffset="97" stroke-linecap="round"/>
+                <defs><linearGradient id="db-cal-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#F97316"/><stop offset="100%" stop-color="#FBBF24"/></linearGradient></defs>
+              </svg>
+              <div class="macro-center">
+                <div class="macro-kcal" id="db-kcal-today">–</div>
+                <div class="macro-kcal-label">kcal</div>
+                <div class="macro-kcal-goal" id="db-kcal-goal">/ 2350</div>
+              </div>
+            </div>
+          </div>
+          <div class="macro-bars" style="padding:0 0.5rem">
+            <div class="macro-bar-item">
+              <div class="macro-bar-header"><span class="macro-name" data-i18n="nutrition.protein">Protein</span><span class="macro-val" id="db-protein">–g</span></div>
+              <div class="macro-bar-track"><div class="macro-bar-fill protein-fill" id="db-protein-bar" style="width:0%"></div></div>
+            </div>
+            <div class="macro-bar-item">
+              <div class="macro-bar-header"><span class="macro-name" data-i18n="nutrition.carbs">Carbs</span><span class="macro-val" id="db-carbs">–g</span></div>
+              <div class="macro-bar-track"><div class="macro-bar-fill carbs-fill" id="db-carbs-bar" style="width:0%"></div></div>
+            </div>
+            <div class="macro-bar-item">
+              <div class="macro-bar-header"><span class="macro-name" data-i18n="nutrition.fat">Fat</span><span class="macro-val" id="db-fat">–g</span></div>
+              <div class="macro-bar-track"><div class="macro-bar-fill fat-fill" id="db-fat-bar" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="db-card">
+          <div class="db-card-header"><h3 data-i18n="db.log.meal">Log a Meal</h3></div>
+          <form id="nutrition-form">
+            <div class="form-group">
+              <label class="form-label" data-i18n="db.meal.type">Meal</label>
+              <select class="form-input form-select" id="meal-type">
+                <option value="breakfast" data-i18n="nutrition.breakfast">Breakfast</option>
+                <option value="lunch" data-i18n="nutrition.lunch">Lunch</option>
+                <option value="dinner" data-i18n="nutrition.dinner">Dinner</option>
+                <option value="snack" data-i18n="nutrition.snack">Snack</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="db.meal.name">Description</label>
+              <input class="form-input" type="text" id="meal-name" placeholder="e.g. Chicken + Rice"/>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">kcal</label>
+                <input class="form-input" type="number" id="meal-kcal" placeholder="500" min="0"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="nutrition.protein">Protein (g)</label>
+                <input class="form-input" type="number" id="meal-protein" placeholder="40" min="0"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" data-i18n="nutrition.carbs">Carbs (g)</label>
+                <input class="form-input" type="number" id="meal-carbs" placeholder="60" min="0"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="nutrition.fat">Fat (g)</label>
+                <input class="form-input" type="number" id="meal-fat" placeholder="15" min="0"/>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-full" style="margin-top:0.5rem" data-i18n="db.save.meal">Save Meal</button>
+          </form>
+        </div>
+      </div>
+      <div class="db-card" style="margin-top:1.5rem">
+        <div class="db-card-header"><h3 data-i18n="db.todays.meals">Today's Meals</h3></div>
+        <div id="meals-list"><div class="db-empty-state" data-i18n="db.no.meals">No meals logged today.</div></div>
+      </div>
+    </section>
+
+    <!-- ── PROGRESS PANEL ── -->
+    <section class="db-panel" id="panel-progress" style="display:none" aria-label="Progress">
+      <div class="db-panel-header">
+        <h2 class="db-panel-title" data-i18n="db.progress.title">Progress</h2>
+      </div>
+      <div class="db-stats-row" role="list">
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-orange" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/></svg></div>
+          <div class="db-stat-body"><div class="db-stat-val" id="pr-best-squat">–</div><div class="db-stat-label" data-i18n="progress.squat">Squat PR</div></div>
+        </div>
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-green" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4v6a6 6 0 0012 0V4"/></svg></div>
+          <div class="db-stat-body"><div class="db-stat-val" id="pr-best-bench">–</div><div class="db-stat-label" data-i18n="db.bench.pr">Bench PR</div></div>
+        </div>
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-purple" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="6"/><path d="M12 22V12M9 12l3-4 3 4"/></svg></div>
+          <div class="db-stat-body"><div class="db-stat-val" id="pr-best-dl">–</div><div class="db-stat-label" data-i18n="db.deadlift.pr">Deadlift PR</div></div>
+        </div>
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-amber" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+          <div class="db-stat-body"><div class="db-stat-val" id="pr-vo2">–</div><div class="db-stat-label" data-i18n="progress.vo2">VO₂ Max</div></div>
+        </div>
+      </div>
+
+      <!-- Weight trend chart -->
+      <div class="db-card">
+        <div class="db-card-header">
+          <h3 data-i18n="db.weight.trend">Body Weight Trend</h3>
+          <span class="db-card-meta" id="pr-weight-change">–</span>
+        </div>
+        <div class="db-chart-placeholder" aria-label="Weight trend chart — log measurements to see data">
+          <svg viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg" id="weight-chart-svg" role="img" aria-label="Weight trend">
+            <!-- Dynamic chart lines injected by JS -->
+            <text x="300" y="85" fill="#4e5869" font-size="13" text-anchor="middle" id="weight-chart-empty">Log body measurements to see your weight trend</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Personal bests table -->
+      <div class="db-card">
+        <div class="db-card-header">
+          <h3 data-i18n="db.personal.bests">Personal Bests</h3>
+          <button class="btn btn-secondary" id="add-pr-btn" style="padding:0.4rem 1rem;font-size:0.8rem" data-i18n="db.add.pr">Add PR</button>
+        </div>
+        <div id="pbs-table-wrap">
+          <div class="db-empty-state" data-i18n="db.no.prs">No personal bests recorded yet.</div>
+        </div>
+      </div>
+
+      <!-- Add PR form -->
+      <div class="db-card" id="add-pr-form" style="display:none">
+        <h3 data-i18n="db.log.pr">Log Personal Best</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" data-i18n="db.exercise">Exercise</label>
+            <input class="form-input" type="text" id="pr-exercise" placeholder="e.g. Squat"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Weight (kg)</label>
+            <input class="form-input" type="number" id="pr-weight" placeholder="100" min="0"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reps</label>
+            <input class="form-input" type="number" id="pr-reps" placeholder="1" min="1"/>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;margin-top:1rem">
+          <button class="btn btn-primary" id="pr-save-btn" data-i18n="db.save">Save PR</button>
+          <button class="btn btn-secondary" id="pr-cancel-btn" data-i18n="db.cancel">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── BODY STATS PANEL ── -->
+    <section class="db-panel" id="panel-body" style="display:none" aria-label="Body Stats">
+      <div class="db-panel-header">
+        <h2 class="db-panel-title" data-i18n="db.body.title">Body Stats</h2>
+        <button class="btn btn-primary" id="add-measurement-btn" style="padding:0.6rem 1.25rem;font-size:0.875rem" data-i18n="db.add.measurement">Add Measurement</button>
+      </div>
+
+      <!-- Latest stats cards -->
+      <div class="db-stats-row" role="list" id="body-stats-row">
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-orange" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-3 3"/></svg></div>
+          <div class="db-stat-body"><div class="db-stat-val" id="body-weight">–</div><div class="db-stat-label" data-i18n="db.weight.kg">Weight (kg)</div></div>
+        </div>
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-green" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+          <div class="db-stat-body"><div class="db-stat-val" id="body-bmi">–</div><div class="db-stat-label">BMI</div></div>
+        </div>
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-purple" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+          <div class="db-stat-body"><div class="db-stat-val" id="body-fat">–</div><div class="db-stat-label" data-i18n="db.bodyfat">Body Fat %</div></div>
+        </div>
+        <div class="db-stat-card" role="listitem">
+          <div class="db-stat-icon dsi-cyan" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+          <div class="db-stat-body"><div class="db-stat-val" id="body-muscle">–</div><div class="db-stat-label" data-i18n="db.muscle.mass">Muscle Mass</div></div>
+        </div>
+      </div>
+
+      <!-- Add measurement form -->
+      <div class="db-card" id="measurement-form-card" style="display:none">
+        <h3 data-i18n="db.add.measurement">Add Measurement</h3>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Weight (kg)</label><input class="form-input" type="number" id="m-weight" placeholder="75.5" step="0.1"/></div>
+          <div class="form-group"><label class="form-label">Height (cm)</label><input class="form-input" type="number" id="m-height" placeholder="178"/></div>
+          <div class="form-group"><label class="form-label" data-i18n="db.bodyfat">Body Fat %</label><input class="form-input" type="number" id="m-bodyfat" placeholder="18" step="0.1"/></div>
+          <div class="form-group"><label class="form-label" data-i18n="db.muscle.mass">Muscle Mass (kg)</label><input class="form-input" type="number" id="m-muscle" placeholder="60" step="0.1"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" data-i18n="db.chest.cm">Chest (cm)</label><input class="form-input" type="number" id="m-chest" placeholder="100"/></div>
+          <div class="form-group"><label class="form-label" data-i18n="db.waist.cm">Waist (cm)</label><input class="form-input" type="number" id="m-waist" placeholder="85"/></div>
+          <div class="form-group"><label class="form-label" data-i18n="db.hips.cm">Hips (cm)</label><input class="form-input" type="number" id="m-hips" placeholder="96"/></div>
+          <div class="form-group"><label class="form-label" data-i18n="db.arms.cm">Arms (cm)</label><input class="form-input" type="number" id="m-arms" placeholder="38"/></div>
+        </div>
+        <div style="display:flex;gap:1rem;margin-top:1rem">
+          <button class="btn btn-primary" id="measurement-save-btn" data-i18n="db.save">Save</button>
+          <button class="btn btn-secondary" id="measurement-cancel-btn" data-i18n="db.cancel">Cancel</button>
+        </div>
+        <p class="auth-error" id="measurement-error" role="alert"></p>
+      </div>
+
+      <!-- Measurement history table -->
+      <div class="db-card">
+        <div class="db-card-header"><h3 data-i18n="db.measurement.history">Measurement History</h3></div>
+        <div id="measurements-table-wrap">
+          <div class="db-empty-state" data-i18n="db.no.measurements">No measurements recorded yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SETTINGS PANEL ── -->
+    <section class="db-panel" id="panel-settings" style="display:none" aria-label="Settings">
+      <div class="db-panel-header">
+        <h2 class="db-panel-title" data-i18n="db.settings.title">Settings</h2>
+      </div>
+
+      <div class="db-two-col settings-layout">
+        <!-- Profile form -->
+        <div class="db-card">
+          <div class="db-card-header"><h3 data-i18n="db.profile">Profile</h3></div>
+          <form id="settings-form">
+            <div class="settings-avatar-upload" aria-label="Avatar">
+              <div class="db-avatar-xl" id="settings-avatar" aria-hidden="true"></div>
+              <div>
+                <div class="db-profile-name" id="settings-name-display">–</div>
+                <div class="db-profile-level-badge" id="settings-level-display">–</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" data-i18n="auth.firstname">First Name</label>
+                <input class="form-input" type="text" id="settings-fname" autocomplete="given-name"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="auth.lastname">Last Name</label>
+                <input class="form-input" type="text" id="settings-lname" autocomplete="family-name"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="auth.email">Email</label>
+              <input class="form-input" type="email" id="settings-email" autocomplete="email" disabled style="opacity:0.5;cursor:not-allowed"/>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" data-i18n="auth.level">Fitness Level</label>
+                <select class="form-input form-select" id="settings-level">
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                  <option value="elite">Elite</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="auth.goal">Primary Goal</label>
+                <select class="form-input form-select" id="settings-goal">
+                  <option value="strength">Strength</option>
+                  <option value="weight_loss">Weight Loss</option>
+                  <option value="muscle_gain">Muscle Gain</option>
+                  <option value="endurance">Endurance</option>
+                  <option value="mobility">Mobility</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:0.5rem" data-i18n="db.save.profile">Save Profile</button>
+            <p class="auth-error" id="settings-error" role="alert" style="margin-top:0.5rem"></p>
+            <p class="settings-success" id="settings-success" style="display:none;color:#22C55E;font-size:0.875rem;margin-top:0.5rem" data-i18n="db.saved">Saved!</p>
+          </form>
+        </div>
+
+        <!-- Account info -->
+        <div style="display:flex;flex-direction:column;gap:1.5rem">
+          <div class="db-card">
+            <div class="db-card-header"><h3 data-i18n="db.subscription">Subscription</h3></div>
+            <div class="plan-info-row">
+              <div>
+                <div class="plan-info-name" id="settings-plan-name">Free</div>
+                <div class="plan-info-desc" data-i18n="db.plan.desc">Upgrade to Pro for unlimited access</div>
+              </div>
+              <a href="#pricing" class="btn btn-primary" onclick="closeDashboard()" style="padding:0.5rem 1.25rem;font-size:0.875rem" data-i18n="db.upgrade">Upgrade</a>
+            </div>
+          </div>
+          <div class="db-card">
+            <div class="db-card-header"><h3 data-i18n="db.preferences">Preferences</h3></div>
+            <div class="pref-row">
+              <span data-i18n="db.language">Language</span>
+              <button class="lang-toggle" id="settings-lang-btn" aria-label="Switch language">
+                <span id="settings-lang-label">EN</span>
+              </button>
+            </div>
+            <div class="pref-row">
+              <span data-i18n="db.units">Units</span>
+              <div class="units-toggle" role="group" aria-label="Unit system">
+                <button class="units-btn active" data-unit="metric">Metric</button>
+                <button class="units-btn" data-unit="imperial">Imperial</button>
+              </div>
+            </div>
+          </div>
+          <div class="db-card db-danger-card">
+            <div class="db-card-header"><h3 data-i18n="db.danger.zone">Danger Zone</h3></div>
+            <button class="btn btn-danger w-full" id="settings-logout-btn" data-i18n="db.logout">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Log Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>
