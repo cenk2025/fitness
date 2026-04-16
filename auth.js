@@ -96,7 +96,22 @@
   // ── Error helpers ────────────────────────────────
   function setError(id, msg) {
     const el = document.getElementById(id);
-    if (el) el.textContent = msg;
+    if (el) el.textContent = friendlyError(msg);
+  }
+
+  function friendlyError(msg) {
+    if (!msg) return '';
+    if (/only request this after (\d+) second/i.test(msg)) {
+      const secs = msg.match(/(\d+) second/)?.[1] || 'a few';
+      return `Too many attempts. Please wait ${secs} seconds and try again.`;
+    }
+    if (/invalid login credentials/i.test(msg))  return 'Incorrect email or password.';
+    if (/email.*already.*registered|already.*use/i.test(msg)) return 'An account with this email already exists. Try logging in.';
+    if (/password.*weak|password.*short/i.test(msg)) return 'Password is too weak. Use at least 8 characters with mixed letters and numbers.';
+    if (/invalid email/i.test(msg))              return 'Please enter a valid email address.';
+    if (/network|fetch|failed to fetch/i.test(msg)) return 'Connection error. Check your internet and try again.';
+    if (/email.*not confirmed/i.test(msg))       return 'Please confirm your email first. Check your inbox.';
+    return msg;
   }
   function clearErrors() {
     ['login-email-err','login-pw-err','login-error',
@@ -136,9 +151,7 @@
     setLoading(loginSubmit, false);
 
     if (loginError) {
-      setError('login-error', loginError.message === 'Invalid login credentials'
-        ? 'Incorrect email or password.'
-        : loginError.message);
+      setError('login-error', loginError.message);
       return;
     }
     closeModal();
