@@ -66,25 +66,26 @@
 
   // ── Open / Close ─────────────────────────────────
   async function openDashboard() {
-    try {
-      const guest = window.isGuest && window.isGuest();
-      if (!guest) {
-        const session = await getSession();
-        if (!session) { window.openAuthModal('login'); return; }
-        currentUser = session.user;
-      } else {
-        currentUser = { id: 'guest', email: 'guest@vfitness.app' };
-      }
-
-      overlay.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-      await loadAll();
-      switchPanel('overview');
-    } catch (err) {
-      console.error('[Dashboard] openDashboard failed:', err);
-      overlay.style.display = 'none';
-      document.body.style.overflow = '';
+    const guest = window.isGuest && window.isGuest();
+    if (!guest) {
+      let session;
+      try { session = await getSession(); } catch (e) { session = null; }
+      if (!session) { window.openAuthModal('login'); return; }
+      currentUser = session.user;
+    } else {
+      currentUser = { id: 'guest', email: 'guest@vfitness.app' };
     }
+
+    // Show overlay first — loadAll errors must not hide it
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    try {
+      await loadAll();
+    } catch (err) {
+      console.error('[Dashboard] loadAll failed:', err);
+    }
+    switchPanel('overview');
   }
   window.openDashboard = openDashboard;
 
@@ -151,14 +152,15 @@
       allMeasurements  = GUEST_MEASUREMENTS;
       allPBs           = GUEST_PBS;
 
-      renderProfile(GUEST_PROFILE, currentUser);
-      renderOverview(7);        // 7-day demo streak
-      renderWorkoutsList();
-      renderProgress();
-      renderBodyStats();
-      renderNutrition(GUEST_MEALS);
-      renderSettings();
-      showGuestBanner();
+      const safe = (fn, name) => { try { fn(); } catch(e) { console.error('[render] ' + name, e); } };
+      safe(() => renderProfile(GUEST_PROFILE, currentUser), 'renderProfile');
+      safe(() => renderOverview(7),       'renderOverview');
+      safe(() => renderWorkoutsList(),    'renderWorkoutsList');
+      safe(() => renderProgress(),        'renderProgress');
+      safe(() => renderBodyStats(),       'renderBodyStats');
+      safe(() => renderNutrition(GUEST_MEALS), 'renderNutrition');
+      safe(() => renderSettings(),        'renderSettings');
+      safe(() => showGuestBanner(),       'showGuestBanner');
       return;
     }
 
