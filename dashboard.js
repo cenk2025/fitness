@@ -57,6 +57,11 @@
     { id:'n3', meal_type:'snack',     description:'Greek Yogurt + Almonds',          calories:280, protein_g:18, carbs_g:22, fat_g:14, log_date: today() },
   ];
 
+  const GUEST_PROGRAMS = [
+    { id:'gpr1', status:'active', current_week:3, started_at: daysAgo(14),
+      programs: { name:'Power Foundation', category:'strength', duration_weeks:12, sessions_per_week:4 } },
+  ];
+
   function daysAgo(n) {
     const d = new Date();
     d.setDate(d.getDate() - n);
@@ -154,13 +159,14 @@
 
       const safe = (fn, name) => { try { fn(); } catch(e) { console.error('[render] ' + name, e); } };
       safe(() => renderProfile(GUEST_PROFILE, currentUser), 'renderProfile');
-      safe(() => renderOverview(7),       'renderOverview');
-      safe(() => renderWorkoutsList(),    'renderWorkoutsList');
-      safe(() => renderProgress(),        'renderProgress');
-      safe(() => renderBodyStats(),       'renderBodyStats');
-      safe(() => renderNutrition(GUEST_MEALS), 'renderNutrition');
-      safe(() => renderSettings(),        'renderSettings');
-      safe(() => showGuestBanner(),       'showGuestBanner');
+      safe(() => renderOverview(7),            'renderOverview');
+      safe(() => renderPrograms(GUEST_PROGRAMS), 'renderPrograms');
+      safe(() => renderWorkoutsList(),          'renderWorkoutsList');
+      safe(() => renderProgress(),              'renderProgress');
+      safe(() => renderBodyStats(),             'renderBodyStats');
+      safe(() => renderNutrition(GUEST_MEALS),  'renderNutrition');
+      safe(() => renderSettings(),              'renderSettings');
+      safe(() => showGuestBanner(),             'showGuestBanner');
       return;
     }
 
@@ -192,11 +198,147 @@
     renderBodyStats();
     renderSettings();
 
+    // Programs
+    const { data: userPrograms } = await getUserPrograms(uid);
+    renderPrograms(userPrograms || []);
+
     // Today's nutrition
     const todayDate = new Date().toISOString().slice(0, 10);
     const { data: nutrition } = await getNutritionLogs(uid, todayDate);
     renderNutrition(nutrition || []);
   }
+
+  // ── Programs ─────────────────────────────────────
+  const PROGRAM_COLORS = {
+    strength: '#F97316', cardio: '#22C55E', body_composition: '#8B5CF6', mobility: '#06B6D4'
+  };
+
+  function renderPrograms(userPrograms) {
+    const container = document.getElementById('programs-list');
+    if (!container) return;
+
+    if (!userPrograms || !userPrograms.length) {
+      container.innerHTML = `
+        <div class="db-empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4e5869" stroke-width="1.5" aria-hidden="true"><path d="M4 4h16v2H4zm0 7h16v2H4zm0 7h16v2H4z"/></svg>
+          <p>No active programs yet.</p>
+          <button class="btn btn-primary" onclick="window.closeDashboard();setTimeout(()=>document.getElementById('programs')?.scrollIntoView({behavior:'smooth'}),300)">Browse Programs</button>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = userPrograms.map(up => {
+      const p = up.programs || {};
+      const totalWeeks = p.duration_weeks || 12;
+      const currentWeek = up.current_week || 1;
+      const progress = Math.min(100, Math.round((currentWeek / totalWeeks) * 100));
+      const color = PROGRAM_COLORS[p.category] || '#F97316';
+      const startDate = new Date(up.started_at).toLocaleDateString(undefined, { month:'short', day:'numeric' });
+
+      return `
+        <div class="db-card program-active-card" style="border-left: 3px solid ${color}">
+          <div class="pac-header">
+            <div>
+              <div class="pac-tag" style="color:${color}">${escHtml(p.category || 'program').replace('_',' ')}</div>
+              <h3 class="pac-name">${escHtml(p.name || 'Program')}</h3>
+            </div>
+            <span class="pac-status ${up.status}">${up.status}</span>
+          </div>
+          <div class="pac-progress">
+            <div class="pac-progress-label">
+              <span>Week ${currentWeek}${p.duration_weeks ? ' of ' + p.duration_weeks : ''}</span>
+              <span style="color:${color}">${progress}%</span>
+            </div>
+            <div class="pac-bar-bg"><div class="pac-bar-fill" style="width:${progress}%;background:${color}"></div></div>
+          </div>
+          <div class="pac-meta">
+            ${p.sessions_per_week ? `<span>${p.sessions_per_week}x / week</span>` : ''}
+            <span>Started ${startDate}</span>
+            ${up.status === 'active' ? `<button class="pac-btn-complete" data-program-user-id="${up.id}" onclick="window.completeWeek('${up.id}')">Complete Week ${currentWeek}</button>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Enroll in program ─────────────────────────────
+  window.enrollProgram = async function(programName) {
+    const isGuestMode = window.isGuest && window.isGuest();
+
+    if (!isGuestMode) {
+      const session = await getSession().catch(() => null);
+      if (!session) { window.openAuthModal('signup'); return; }
+    }
+
+    await openDashboard();
+    switchPanel('programs');
+
+    if (isGuestMode) return; // demo data already loaded
+
+    // Enroll in real DB
+    try {
+      const { data: programs } = await db.from('programs').select('id').eq('name', programName).single();
+      if (!programs) return;
+      await db.from('user_programs').upsert({
+        user_id:    currentUser.id,
+        program_id: programs.id,
+        started_at: new Date().toISOString(),
+        status:     'active',
+        current_week: 1
+      }, { onConflict: 'user_id,program_id' });
+
+      const { data: userPrograms } = await getUserPrograms(currentUser.id);
+      renderPrograms(userPrograms || []);
+    } catch (e) { console.error('[enrollProgram]', e); }
+  };
+
+  // ── Complete a program week ───────────────────────
+  window.completeWeek = async function(userProgramId) {
+    if (window.isGuest && window.isGuest()) return;
+    try {
+      // Increment current_week
+      const { data: up } = await db.from('user_programs').select('current_week, programs(duration_weeks)').eq('id', userProgramId).single();
+      if (!up) return;
+      const nextWeek = (up.current_week || 1) + 1;
+      const maxWeeks = up.programs?.duration_weeks;
+      const isComplete = maxWeeks && nextWeek > maxWeeks;
+      await db.from('user_programs').update({
+        current_week: isComplete ? maxWeeks : nextWeek,
+        status: isComplete ? 'completed' : 'active',
+        ...(isComplete ? { completed_at: new Date().toISOString() } : {})
+      }).eq('id', userProgramId);
+
+      const { data: userPrograms } = await getUserPrograms(currentUser.id);
+      renderPrograms(userPrograms || []);
+    } catch (e) { console.error('[completeWeek]', e); }
+  };
+
+  // ── Quick-add workout from landing page ───────────
+  window.quickAddWorkout = async function(name, category, sets, reps, duration) {
+    const isGuestMode = window.isGuest && window.isGuest();
+
+    if (!isGuestMode) {
+      const session = await getSession().catch(() => null);
+      if (!session) { window.openAuthModal('login'); return; }
+    }
+
+    await openDashboard();
+    switchPanel('workouts');
+
+    // Pre-fill the log form
+    const logForm = document.getElementById('log-workout-form');
+    if (logForm) logForm.style.display = '';
+    const ex = document.getElementById('log-exercise');
+    const cat = document.getElementById('log-category');
+    const setsEl = document.getElementById('log-sets');
+    const repsEl = document.getElementById('log-reps');
+    const durEl  = document.getElementById('log-duration');
+    if (ex)    ex.value   = name     || '';
+    if (cat)   cat.value  = category || 'strength';
+    if (setsEl && sets)  setsEl.value = sets;
+    if (repsEl && reps)  repsEl.value = reps;
+    if (durEl  && duration) durEl.value = duration;
+    if (ex) ex.focus();
+  };
 
   // ── Guest banner ──────────────────────────────────
   function showGuestBanner() {

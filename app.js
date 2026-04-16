@@ -771,6 +771,29 @@ document.getElementById('cookie-decline').addEventListener('click', () => {
   hideCookie();
 });
 
+// ── Workout "+" buttons ───────────────────────────
+document.querySelectorAll('.wk-add').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const card = btn.closest('.workout-card');
+    if (!card) return;
+    const name     = card.dataset.name     || '';
+    const category = card.dataset.category || 'strength';
+    const sets     = card.dataset.sets     || '';
+    const reps     = card.dataset.reps     || '';
+    const duration = card.dataset.duration || '';
+    window.quickAddWorkout && window.quickAddWorkout(name, category, sets, reps, duration);
+  });
+});
+
+// ── "Start Program" buttons ───────────────────────
+document.querySelectorAll('.btn-program[data-program]').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    window.enrollProgram && window.enrollProgram(btn.dataset.program);
+  });
+});
+
 // ── Workout Filter ────────────────────────────────
 const filterBtns = document.querySelectorAll('.filter-btn');
 const workoutCards = document.querySelectorAll('.workout-card');
