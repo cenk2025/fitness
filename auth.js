@@ -155,7 +155,7 @@
       return;
     }
     closeModal();
-    // Session listener will update the nav
+    executePendingAction();
   });
 
   // ── Signup ───────────────────────────────────────
@@ -204,13 +204,29 @@
       });
     }
 
-    // Show success / email confirmation message
+    // If session is active immediately (email confirm disabled) → go to dashboard
+    if (data.session) {
+      closeModal();
+      executePendingAction();
+      return;
+    }
+
+    // Email confirmation required
     panelSignup.style.display = 'none';
     authSuccess.style.display = '';
     document.getElementById('auth-success-title').textContent = 'Check your email!';
     document.getElementById('auth-success-msg').textContent =
       'We sent a confirmation link to ' + email + '. Click it to activate your account.';
   });
+
+  // ── Pending action (execute after login) ─────────
+  function executePendingAction() {
+    const action = window._pendingAction;
+    if (!action) return;
+    window._pendingAction = null;
+    setTimeout(action, 400);
+  }
+  window.setPendingAction = fn => { window._pendingAction = fn; };
 
   // ── Guest login ──────────────────────────────────
   const GUEST_KEY = 'vfitness-guest';

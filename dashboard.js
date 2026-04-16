@@ -266,28 +266,41 @@
 
     if (!isGuestMode) {
       const session = await getSession().catch(() => null);
-      if (!session) { window.openAuthModal('signup'); return; }
+      if (!session) {
+        window.setPendingAction && window.setPendingAction(() => window.enrollProgram(programName));
+        window.openAuthModal('signup');
+        return;
+      }
     }
 
-    await openDashboard();
+    // Open dashboard only if not already open
+    if (overlay.style.display !== 'flex') {
+      await openDashboard();
+    } else if (!currentUser) {
+      await openDashboard();
+    }
     switchPanel('programs');
 
-    if (isGuestMode) return; // demo data already loaded
+    if (isGuestMode) return;
 
     // Enroll in real DB
     try {
-      const { data: programs } = await db.from('programs').select('id').eq('name', programName).single();
-      if (!programs) return;
+      const { data: prog } = await db.from('programs').select('id').eq('name', programName).single();
+      if (!prog) { console.warn('[enrollProgram] Program not found:', programName); return; }
+
       await db.from('user_programs').upsert({
-        user_id:    currentUser.id,
-        program_id: programs.id,
-        started_at: new Date().toISOString(),
-        status:     'active',
+        user_id:      currentUser.id,
+        program_id:   prog.id,
+        started_at:   new Date().toISOString(),
+        status:       'active',
         current_week: 1
       }, { onConflict: 'user_id,program_id' });
 
       const { data: userPrograms } = await getUserPrograms(currentUser.id);
       renderPrograms(userPrograms || []);
+
+      // Show success toast
+      showToast(`Enrolled in ${programName}!`);
     } catch (e) { console.error('[enrollProgram]', e); }
   };
 
@@ -318,26 +331,36 @@
 
     if (!isGuestMode) {
       const session = await getSession().catch(() => null);
-      if (!session) { window.openAuthModal('login'); return; }
+      if (!session) {
+        window.setPendingAction && window.setPendingAction(
+          () => window.quickAddWorkout(name, category, sets, reps, duration)
+        );
+        window.openAuthModal('login');
+        return;
+      }
     }
 
-    await openDashboard();
+    if (overlay.style.display !== 'flex') {
+      await openDashboard();
+    } else if (!currentUser) {
+      await openDashboard();
+    }
     switchPanel('workouts');
 
     // Pre-fill the log form
     const logForm = document.getElementById('log-workout-form');
     if (logForm) logForm.style.display = '';
-    const ex = document.getElementById('log-exercise');
-    const cat = document.getElementById('log-category');
+    const ex     = document.getElementById('log-exercise');
+    const cat    = document.getElementById('log-category');
     const setsEl = document.getElementById('log-sets');
     const repsEl = document.getElementById('log-reps');
     const durEl  = document.getElementById('log-duration');
-    if (ex)    ex.value   = name     || '';
-    if (cat)   cat.value  = category || 'strength';
+    if (ex)              ex.value    = name     || '';
+    if (cat)             cat.value   = category || 'strength';
     if (setsEl && sets)  setsEl.value = sets;
     if (repsEl && reps)  repsEl.value = reps;
-    if (durEl  && duration) durEl.value = duration;
-    if (ex) ex.focus();
+    if (durEl && duration) durEl.value = duration;
+    if (ex) { ex.focus(); ex.select(); }
   };
 
   // ── Guest banner ──────────────────────────────────
@@ -537,20 +560,24 @@
 
     if (error) { document.getElementById('log-error').textContent = error.message; return; }
 
-    document.getElementById('log-exercise').value  = '';
-    document.getElementById('log-sets').value      = '';
-    document.getElementById('log-reps').value      = '';
-    document.getElementById('log-weight').value    = '';
-    document.getElementById('log-duration').value  = '';
-    document.getElementById('log-notes').value     = '';
+    document.getElementById('log-exercise').value   = '';
+    document.getElementById('log-sets').value       = '';
+    document.getElementById('log-reps').value       = '';
+    document.getElementById('log-weight').value     = '';
+    document.getElementById('log-duration').value   = '';
+    document.getElementById('log-notes').value      = '';
     document.getElementById('log-error').textContent = '';
     logWorkoutForm.style.display = 'none';
 
-    // Reload
+    // Reload logs + refresh overview stats
     const { data: logs } = await getWorkoutLogs(currentUser.id, 50);
     allWorkoutLogs = logs || [];
     renderWorkoutsList();
-    renderRecentWorkouts('recent-workouts-list', 5);
+
+    const streak = await getStreak(currentUser.id);
+    renderOverview(streak);
+
+    showToast('Workout logged!');
   });
 
   // ── Nutrition ─────────────────────────────────────
@@ -610,11 +637,11 @@
     const { error } = await db.from('nutrition_logs').insert(entry);
     if (error) return;
 
-    // Reset form
     e.target.reset();
-    const today = new Date().toISOString().slice(0, 10);
-    const { data: nutrition } = await getNutritionLogs(currentUser.id, today);
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const { data: nutrition } = await getNutritionLogs(currentUser.id, todayStr);
     renderNutrition(nutrition || []);
+    showToast('Meal logged!');
   });
 
   // ── Progress ──────────────────────────────────────
@@ -737,6 +764,7 @@
     const { data: pbs } = await getPersonalBests(currentUser.id);
     allPBs = pbs || [];
     renderProgress();
+    showToast('Personal best saved!');
   });
 
   // ── Body Stats ────────────────────────────────────
@@ -818,6 +846,7 @@
     allMeasurements = ms || [];
     renderBodyStats();
     renderWeightChart();
+    showToast('Measurement saved!');
   });
 
   // ── Settings ──────────────────────────────────────
@@ -890,6 +919,38 @@
       btn.classList.add('active');
     });
   });
+
+  // ── Toast notification ────────────────────────────
+  function showToast(msg, type = 'success') {
+    const existing = document.getElementById('db-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.id = 'db-toast';
+    const color = type === 'success' ? '#22C55E' : type === 'error' ? '#ef4444' : '#F97316';
+    toast.style.cssText = `
+      position:fixed; bottom:2rem; right:2rem; z-index:999;
+      background:var(--ink-2); border:1px solid ${color}40;
+      border-left:3px solid ${color}; border-radius:var(--r-md);
+      padding:0.85rem 1.25rem; color:var(--text);
+      font-family:var(--font-body); font-size:0.875rem; font-weight:500;
+      box-shadow:var(--shadow-3); display:flex; align-items:center; gap:0.6rem;
+      animation:toastIn 0.25s ease; max-width:280px;
+    `;
+    toast.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.5">
+        <polyline points="20,6 9,17 4,12"/>
+      </svg>${escHtml(msg)}`;
+
+    if (!document.getElementById('db-toast-style')) {
+      const s = document.createElement('style');
+      s.id = 'db-toast-style';
+      s.textContent = '@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}';
+      document.head.appendChild(s);
+    }
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
 
   // ── Utility ───────────────────────────────────────
   function escHtml(s) {
