@@ -32,6 +32,8 @@ CREATE INDEX IF NOT EXISTS idx_program_sessions_program
 
 ALTER TABLE public.program_sessions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Anyone authenticated can read program sessions"
+  ON public.program_sessions;
 CREATE POLICY "Anyone authenticated can read program sessions"
   ON public.program_sessions FOR SELECT
   USING (auth.uid() IS NOT NULL);
@@ -57,6 +59,8 @@ CREATE TABLE IF NOT EXISTS public.program_exercises (
 
 ALTER TABLE public.program_exercises ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Anyone authenticated can read program exercises"
+  ON public.program_exercises;
 CREATE POLICY "Anyone authenticated can read program exercises"
   ON public.program_exercises FOR SELECT
   USING (auth.uid() IS NOT NULL);
@@ -96,6 +100,12 @@ BEGIN
   IF pf_id IS NULL OR ee_id IS NULL OR sd_id IS NULL OR ff_id IS NULL THEN
     RAISE EXCEPTION 'Programs not found. Run schema.sql first.';
   END IF;
+
+  -- Clear any existing Week 1 data for these programs so the script
+  -- can be re-run safely. program_exercises cascades on session delete.
+  DELETE FROM public.program_sessions
+   WHERE week_number = 1
+     AND program_id IN (pf_id, ee_id, sd_id, ff_id);
 
   -- ═══════════════════════════════════════════════
   -- POWER FOUNDATION  (4 sessions / week)
