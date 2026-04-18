@@ -28,14 +28,40 @@
     goal: 'strength', plan: 'demo', calorie_goal: 2350,
   };
 
-  const GUEST_LOGS = [
-    { id:'g1', exercise_name:'Bench Press',   category:'chest',  sets:4, reps:10, weight_kg:80,  duration_minutes:45, logged_at: daysAgo(0) },
-    { id:'g2', exercise_name:'Back Squat',     category:'legs',   sets:5, reps:5,  weight_kg:100, duration_minutes:55, logged_at: daysAgo(1) },
-    { id:'g3', exercise_name:'Deadlift',       category:'back',   sets:4, reps:6,  weight_kg:120, duration_minutes:60, logged_at: daysAgo(2) },
-    { id:'g4', exercise_name:'Overhead Press', category:'shoulders', sets:4, reps:8, weight_kg:60, duration_minutes:40, logged_at: daysAgo(4) },
-    { id:'g5', exercise_name:'Plank Circuit',  category:'core',   sets:3, reps:null, weight_kg:null, duration_minutes:20, logged_at: daysAgo(5) },
-    { id:'g6', exercise_name:'Tabata Blast',   category:'hiit',   sets:8, reps:null, weight_kg:null, duration_minutes:25, logged_at: daysAgo(6) },
+  // Rolling 30-day guest history so Activity panel looks alive (~4 workouts/week).
+  const GUEST_LOG_PATTERN = [
+    { d:0,  name:'Bench Press',         cat:'chest',     sets:4, reps:10, wt:80,  min:45 },
+    { d:1,  name:'Back Squat',          cat:'legs',      sets:5, reps:5,  wt:100, min:55 },
+    { d:2,  name:'Deadlift',            cat:'back',      sets:4, reps:6,  wt:120, min:60 },
+    { d:4,  name:'Overhead Press',      cat:'shoulders', sets:4, reps:8,  wt:60,  min:40 },
+    { d:5,  name:'Plank Circuit',       cat:'core',      sets:3, reps:null,wt:null,min:20 },
+    { d:6,  name:'Tabata Blast',        cat:'hiit',      sets:8, reps:null,wt:null,min:25 },
+    { d:8,  name:'Incline Bench',       cat:'chest',     sets:4, reps:8,  wt:75,  min:42 },
+    { d:9,  name:'Front Squat',         cat:'legs',      sets:4, reps:6,  wt:90,  min:50 },
+    { d:10, name:'Barbell Row',         cat:'back',      sets:4, reps:8,  wt:85,  min:45 },
+    { d:12, name:'HIIT Sprint',         cat:'hiit',      sets:10,reps:null,wt:null,min:28 },
+    { d:13, name:'Mobility Flow',       cat:'mobility',  sets:1, reps:null,wt:null,min:30 },
+    { d:15, name:'Bench Press',         cat:'chest',     sets:4, reps:10, wt:77,  min:45 },
+    { d:16, name:'Back Squat',          cat:'legs',      sets:5, reps:5,  wt:97,  min:55 },
+    { d:17, name:'Pull-Up',             cat:'back',      sets:4, reps:8,  wt:null,min:35 },
+    { d:19, name:'Long Run Zone 2',     cat:'cardio',    sets:1, reps:null,wt:null,min:45 },
+    { d:20, name:'Mobility Flow',       cat:'mobility',  sets:1, reps:null,wt:null,min:25 },
+    { d:22, name:'Deadlift',            cat:'back',      sets:4, reps:5,  wt:115, min:60 },
+    { d:23, name:'OHP',                 cat:'shoulders', sets:4, reps:8,  wt:57,  min:38 },
+    { d:25, name:'HIIT Circuit',        cat:'hiit',      sets:6, reps:null,wt:null,min:25 },
+    { d:27, name:'Back Squat',          cat:'legs',      sets:5, reps:5,  wt:95,  min:55 },
+    { d:28, name:'Full Body Accessory', cat:'full_body', sets:5, reps:12, wt:null,min:45 },
   ];
+  const GUEST_LOGS = GUEST_LOG_PATTERN.map((w, i) => ({
+    id: 'g' + i,
+    exercise_name: w.name,
+    category: w.cat,
+    sets: w.sets,
+    reps: w.reps,
+    weight_kg: w.wt,
+    duration_minutes: w.min,
+    logged_at: daysAgo(w.d),
+  }));
 
   const GUEST_MEASUREMENTS = [
     { id:'m1', weight_kg:78.5, height_cm:180, body_fat_pct:16.2, muscle_mass_kg:62.1, chest_cm:102, waist_cm:84, hips_cm:97, arms_cm:38, measured_at: daysAgo(0)  },
@@ -119,7 +145,7 @@
 
   // ── Panel switching ───────────────────────────────
   const panelTitles = {
-    overview: 'Overview', programs: 'My Programs', workouts: 'Workouts',
+    overview: 'Overview', activity: 'Activity', programs: 'My Programs', workouts: 'Workouts',
     nutrition: 'Nutrition', progress: 'Progress', body: 'Body Stats', settings: 'Settings'
   };
 
@@ -160,6 +186,7 @@
       const safe = (fn, name) => { try { fn(); } catch(e) { console.error('[render] ' + name, e); } };
       safe(() => renderProfile(GUEST_PROFILE, currentUser), 'renderProfile');
       safe(() => renderOverview(7),            'renderOverview');
+      safe(() => renderActivity(7),            'renderActivity');
       safe(() => renderPrograms(GUEST_PROGRAMS), 'renderPrograms');
       safe(() => renderWorkoutsList(),          'renderWorkoutsList');
       safe(() => renderProgress(),              'renderProgress');
@@ -193,6 +220,7 @@
     const streak = await getStreak(uid);
 
     renderOverview(streak);
+    renderActivity(streak);
     renderWorkoutsList();
     renderProgress();
     renderBodyStats();
@@ -1391,5 +1419,343 @@
 
     renderProgramDetailModal(name, sessions, staticMeta);
   };
+
+  /* ═══════════════════════════════════════════════
+     ACTIVITY PANEL  —  Day / Week / Month
+  ═══════════════════════════════════════════════ */
+
+  const KCAL_PER_MIN = {
+    chest: 7, back: 7, legs: 8, shoulders: 6, arms: 6, core: 5,
+    push: 7, pull: 7, hiit: 12, cardio: 10, mobility: 4,
+    full_body: 8, recovery: 3,
+  };
+  const DAILY_MINUTE_GOAL = 60;
+  const RING_CIRCUMFERENCE = 2 * Math.PI * 100; // r=100 → 628.318
+
+  // Activity state
+  let actView = 'day';
+  let actDayDate = startOfDay(new Date());
+  let actWeekDate = startOfWeek(new Date());
+  let actMonthDate = startOfMonth(new Date());
+
+  function startOfDay(d) { const x = new Date(d); x.setHours(0,0,0,0); return x; }
+  function startOfWeek(d) {
+    const x = startOfDay(d);
+    // Monday-based week (Finnish convention works too)
+    const dow = (x.getDay() + 6) % 7;
+    x.setDate(x.getDate() - dow);
+    return x;
+  }
+  function startOfMonth(d) { const x = startOfDay(d); x.setDate(1); return x; }
+  function addDays(d, n)   { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+  function sameDay(a, b)   { return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+  function estKcal(log)    { return Math.round((log.duration_minutes || 0) * (KCAL_PER_MIN[log.category] || 7)); }
+
+  function logsInRange(from, toExclusive) {
+    return allWorkoutLogs.filter(l => {
+      const t = new Date(l.logged_at).getTime();
+      return t >= from.getTime() && t < toExclusive.getTime();
+    });
+  }
+
+  function aggregate(logs) {
+    let min = 0, kcal = 0;
+    logs.forEach(l => { min += l.duration_minutes || 0; kcal += estKcal(l); });
+    return { minutes: min, kcal, sessions: logs.length, hours: (min / 60) };
+  }
+
+  function fmtHours(min) {
+    if (min <= 0) return '0';
+    const h = min / 60;
+    return h < 10 ? h.toFixed(1) : Math.round(h).toString();
+  }
+
+  function formatDayLabel(d) {
+    const today = startOfDay(new Date());
+    if (sameDay(d, today))                return tr('act.today', 'Today');
+    if (sameDay(d, addDays(today, -1)))   return tr('act.yesterday', 'Yesterday');
+    return d.toLocaleDateString(currentLang === 'fi' ? 'fi-FI' : 'en-US', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+
+  function getLang() {
+    try { return localStorage.getItem('vfitness-lang') || 'en'; } catch (_) { return 'en'; }
+  }
+  const currentLang = getLang();
+
+  function tr(key, fallback) {
+    try {
+      const strings = (typeof i18n !== 'undefined' && i18n[currentLang]) || {};
+      return strings[key] || fallback;
+    } catch (_) { return fallback; }
+  }
+
+  // ── Entry point ───────────────────────────────────
+  function renderActivity(streakVal) {
+    const panel = document.getElementById('panel-activity');
+    if (!panel) return;
+    // Remember streak for Day + Month stat tiles
+    panel.dataset.streak = String(streakVal || 0);
+    bindActivityOnce();
+    renderActivityView();
+  }
+
+  let actBound = false;
+  function bindActivityOnce() {
+    if (actBound) return;
+    actBound = true;
+
+    document.querySelectorAll('.act-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        actView = tab.dataset.view;
+        document.querySelectorAll('.act-tab').forEach(t => {
+          const on = t === tab;
+          t.classList.toggle('active', on);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        ['day','week','month'].forEach(v => {
+          const el = document.getElementById('act-view-' + v);
+          if (el) el.style.display = v === actView ? '' : 'none';
+        });
+        renderActivityView();
+      });
+    });
+
+    document.getElementById('act-day-prev')?.addEventListener('click', () => { actDayDate = addDays(actDayDate, -1); renderActivityView(); });
+    document.getElementById('act-day-next')?.addEventListener('click', () => {
+      const next = addDays(actDayDate, 1);
+      if (next.getTime() <= startOfDay(new Date()).getTime()) { actDayDate = next; renderActivityView(); }
+    });
+    document.getElementById('act-week-prev')?.addEventListener('click', () => { actWeekDate = addDays(actWeekDate, -7); renderActivityView(); });
+    document.getElementById('act-week-next')?.addEventListener('click', () => {
+      const next = addDays(actWeekDate, 7);
+      if (next.getTime() <= startOfWeek(new Date()).getTime()) { actWeekDate = next; renderActivityView(); }
+    });
+    document.getElementById('act-month-prev')?.addEventListener('click', () => {
+      const m = new Date(actMonthDate); m.setMonth(m.getMonth() - 1); actMonthDate = startOfMonth(m); renderActivityView();
+    });
+    document.getElementById('act-month-next')?.addEventListener('click', () => {
+      const m = new Date(actMonthDate); m.setMonth(m.getMonth() + 1);
+      if (m.getTime() <= startOfMonth(new Date()).getTime()) { actMonthDate = startOfMonth(m); renderActivityView(); }
+    });
+  }
+
+  function renderActivityView() {
+    if (actView === 'day')   renderActivityDay();
+    if (actView === 'week')  renderActivityWeek();
+    if (actView === 'month') renderActivityMonth();
+  }
+
+  // ── Day ───────────────────────────────────────────
+  function renderActivityDay() {
+    const d = actDayDate;
+    const label = document.getElementById('act-day-label');
+    if (label) label.textContent = formatDayLabel(d);
+
+    const ringLabel = document.getElementById('act-ring-label');
+    if (ringLabel) ringLabel.textContent = formatDayLabel(d).toUpperCase();
+
+    document.getElementById('act-day-next').disabled = sameDay(d, startOfDay(new Date()));
+
+    const logs = logsInRange(d, addDays(d, 1));
+    const agg  = aggregate(logs);
+
+    document.getElementById('act-day-val').textContent = agg.minutes;
+    document.getElementById('act-day-goal').textContent = DAILY_MINUTE_GOAL;
+
+    const ring = document.getElementById('act-ring-fill');
+    if (ring) {
+      const pct = Math.min(agg.minutes / DAILY_MINUTE_GOAL, 1);
+      ring.setAttribute('stroke-dashoffset', String(RING_CIRCUMFERENCE * (1 - pct)));
+      ring.classList.toggle('at-goal', pct >= 1);
+    }
+
+    const panel = document.getElementById('panel-activity');
+    const streakVal = parseInt(panel?.dataset.streak || '0', 10);
+    document.getElementById('act-day-streak').textContent   = streakVal;
+    document.getElementById('act-day-kcal').textContent     = agg.kcal;
+    document.getElementById('act-day-sessions').textContent = agg.sessions;
+    document.getElementById('act-day-hours').textContent    = fmtHours(agg.minutes);
+
+    renderTrendChart(d);
+  }
+
+  function renderTrendChart(anchor) {
+    const svg = document.getElementById('act-day-trend');
+    if (!svg) return;
+    const W = 600, H = 180, pad = 24;
+    const innerW = W - pad * 2;
+    const innerH = H - pad * 2;
+
+    const points = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = addDays(anchor, -i);
+      const logs = logsInRange(d, addDays(d, 1));
+      const mins = logs.reduce((s, l) => s + (l.duration_minutes || 0), 0);
+      points.push({ date: d, mins });
+    }
+    const maxVal = Math.max(DAILY_MINUTE_GOAL, ...points.map(p => p.mins), 30);
+
+    const xs = (i) => pad + (innerW * i) / (points.length - 1);
+    const ys = (v) => pad + innerH - (innerH * v) / maxVal;
+
+    const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xs(i).toFixed(1)} ${ys(p.mins).toFixed(1)}`).join(' ');
+    const area = `${path} L ${xs(points.length-1).toFixed(1)} ${pad + innerH} L ${xs(0).toFixed(1)} ${pad + innerH} Z`;
+
+    const goalY = ys(DAILY_MINUTE_GOAL);
+
+    const labels = points.map((p, i) => {
+      const txt = p.date.toLocaleDateString(currentLang === 'fi' ? 'fi-FI' : 'en-US', { weekday: 'short' });
+      return `<text x="${xs(i).toFixed(1)}" y="${(H - 4).toFixed(1)}" fill="#4e5869" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">${txt.toUpperCase()}</text>`;
+    }).join('');
+
+    const dots = points.map((p, i) => {
+      const isAnchor = i === points.length - 1;
+      return `<circle cx="${xs(i).toFixed(1)}" cy="${ys(p.mins).toFixed(1)}" r="${isAnchor ? 5 : 3.5}" fill="${isAnchor ? '#22d3ee' : '#a3e635'}" stroke="#080a12" stroke-width="2"/>`;
+    }).join('');
+
+    svg.innerHTML = `
+      <defs>
+        <linearGradient id="act-trend-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#a3e635" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#a3e635" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <line x1="${pad}" y1="${goalY.toFixed(1)}" x2="${W - pad}" y2="${goalY.toFixed(1)}" stroke="#4e5869" stroke-width="1" stroke-dasharray="4 4"/>
+      <path d="${area}" fill="url(#act-trend-grad)"/>
+      <path d="${path}" fill="none" stroke="#a3e635" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+      ${labels}
+    `;
+  }
+
+  // ── Week ──────────────────────────────────────────
+  function renderActivityWeek() {
+    const start = actWeekDate;
+    const end   = addDays(start, 7);
+
+    const label = document.getElementById('act-week-label');
+    const startFmt = start.toLocaleDateString(currentLang === 'fi' ? 'fi-FI' : 'en-US', { day: 'numeric', month: 'short' });
+    const endFmt   = addDays(start, 6).toLocaleDateString(currentLang === 'fi' ? 'fi-FI' : 'en-US', { day: 'numeric', month: 'short' });
+    if (label) label.textContent = `${startFmt} – ${endFmt}`;
+
+    document.getElementById('act-week-next').disabled = start.getTime() >= startOfWeek(new Date()).getTime();
+
+    const dayNames = currentLang === 'fi'
+      ? ['M','T','K','T','P','L','S']
+      : ['M','T','W','T','F','S','S'];
+    const today = startOfDay(new Date());
+    const maxVal = Math.max(DAILY_MINUTE_GOAL, 30);
+
+    const perDay = [];
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(start, i);
+      const logs = logsInRange(d, addDays(d, 1));
+      const mins = logs.reduce((s, l) => s + (l.duration_minutes || 0), 0);
+      perDay.push({ d, mins });
+    }
+    const maxMins = Math.max(maxVal, ...perDay.map(p => p.mins));
+
+    const bars = document.getElementById('act-week-bars');
+    if (bars) {
+      bars.innerHTML = perDay.map((p, i) => {
+        const pct = Math.min((p.mins / maxMins) * 100, 100);
+        const isToday = sameDay(p.d, today);
+        const empty = p.mins === 0 ? ' is-empty' : '';
+        return `
+          <div class="act-bar${isToday ? ' is-today' : ''}${empty}">
+            <div class="act-bar-val">${p.mins || '–'}</div>
+            <div class="act-bar-fill-wrap">
+              <div class="act-bar-fill" style="height:${pct.toFixed(1)}%"></div>
+            </div>
+            <div class="act-bar-label">${dayNames[i]}</div>
+          </div>`;
+      }).join('');
+    }
+
+    const logs = logsInRange(start, end);
+    const agg = aggregate(logs);
+    const activeDays = perDay.filter(p => p.mins > 0).length;
+
+    document.getElementById('act-week-total').innerHTML = `${agg.minutes} <span>${tr('act.min', 'min')}</span>`;
+    document.getElementById('act-week-kcal').textContent     = agg.kcal;
+    document.getElementById('act-week-sessions').textContent = agg.sessions;
+    document.getElementById('act-week-hours').textContent    = fmtHours(agg.minutes);
+    document.getElementById('act-week-days').textContent     = `${activeDays}/7`;
+  }
+
+  // ── Month ─────────────────────────────────────────
+  function renderActivityMonth() {
+    const start = actMonthDate;
+    const year  = start.getFullYear();
+    const month = start.getMonth();
+    const end   = new Date(year, month + 1, 1);
+
+    const label = document.getElementById('act-month-label');
+    if (label) {
+      label.textContent = start.toLocaleDateString(currentLang === 'fi' ? 'fi-FI' : 'en-US', { month: 'long', year: 'numeric' });
+    }
+
+    document.getElementById('act-month-next').disabled = start.getTime() >= startOfMonth(new Date()).getTime();
+
+    // Build a map: day-of-month → minutes
+    const byDay = new Map();
+    logsInRange(start, end).forEach(l => {
+      const d = new Date(l.logged_at);
+      const k = d.getDate();
+      byDay.set(k, (byDay.get(k) || 0) + (l.duration_minutes || 0));
+    });
+
+    const firstDow   = (start.getDay() + 6) % 7; // Monday=0
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = startOfDay(new Date());
+
+    const cells = [];
+    for (let i = 0; i < firstDow; i++) cells.push('<button class="act-cal-day is-blank" aria-hidden="true" tabindex="-1"></button>');
+    for (let day = 1; day <= daysInMonth; day++) {
+      const cellDate = new Date(year, month, day);
+      const classes = ['act-cal-day', 'in-month'];
+      if (byDay.get(day) > 0)              classes.push('has-workout');
+      if (sameDay(cellDate, today))        classes.push('is-today');
+      if (cellDate.getTime() > today.getTime()) classes.push('is-future');
+      cells.push(`<button class="${classes.join(' ')}" data-day="${day}" aria-label="${cellDate.toDateString()}">${day}</button>`);
+    }
+    const trailing = (7 - ((firstDow + daysInMonth) % 7)) % 7;
+    for (let i = 0; i < trailing; i++) cells.push('<button class="act-cal-day is-blank" aria-hidden="true" tabindex="-1"></button>');
+
+    const cal = document.getElementById('act-calendar');
+    if (cal) {
+      cal.innerHTML = cells.join('');
+      cal.querySelectorAll('.act-cal-day[data-day]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.classList.contains('is-future')) return;
+          const dayNum = parseInt(btn.dataset.day, 10);
+          actDayDate = new Date(year, month, dayNum);
+          actView = 'day';
+          document.querySelectorAll('.act-tab').forEach(t => {
+            const on = t.dataset.view === 'day';
+            t.classList.toggle('active', on);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+          });
+          ['day','week','month'].forEach(v => {
+            const el = document.getElementById('act-view-' + v);
+            if (el) el.style.display = v === 'day' ? '' : 'none';
+          });
+          renderActivityView();
+        });
+      });
+    }
+
+    const logs = logsInRange(start, end);
+    const agg = aggregate(logs);
+    const panel = document.getElementById('panel-activity');
+    const streakVal = parseInt(panel?.dataset.streak || '0', 10);
+
+    document.getElementById('act-month-streak').textContent   = streakVal;
+    document.getElementById('act-month-kcal').textContent     = agg.kcal;
+    document.getElementById('act-month-sessions').textContent = agg.sessions;
+    document.getElementById('act-month-hours').textContent    = fmtHours(agg.minutes);
+  }
+
+  window.renderActivity = renderActivity;
 
 })();

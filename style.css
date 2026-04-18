@@ -2184,3 +2184,324 @@ textarea.form-input { resize: vertical; }
   .pd-session-tab { min-width: 75px; padding: 0.45rem 0.7rem; }
   .pd-tab-name { font-size: 0.72rem; }
 }
+
+/* ═══════════════════════════════════════════════════
+   ACTIVITY PANEL — Day / Week / Month
+═══════════════════════════════════════════════════ */
+
+.act-tabs {
+  display: flex;
+  gap: var(--s1);
+  justify-content: center;
+  margin-bottom: var(--s4);
+  padding: 0.25rem;
+  background: var(--ink-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.act-tab {
+  flex: 1;
+  padding: 0.55rem 1.1rem;
+  background: transparent;
+  border: 0;
+  color: var(--text-2);
+  font: 600 0.9rem var(--font-body);
+  border-radius: var(--r-full);
+  cursor: pointer;
+  transition: color var(--t), background var(--t);
+}
+.act-tab:hover { color: var(--text); }
+.act-tab.active {
+  background: var(--ink-3);
+  color: var(--lime);
+  box-shadow: 0 0 0 1px var(--lime-border);
+}
+
+.act-view { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.act-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s3);
+  margin-bottom: var(--s4);
+}
+.act-nav-arrow {
+  width: 36px; height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  background: var(--ink-2);
+  color: var(--text-2);
+  border-radius: var(--r-full);
+  cursor: pointer;
+  transition: color var(--t), background var(--t), border-color var(--t);
+}
+.act-nav-arrow:hover:not(:disabled) {
+  color: var(--lime);
+  border-color: var(--lime-border);
+  background: var(--lime-soft);
+}
+.act-nav-arrow:disabled { opacity: 0.35; cursor: not-allowed; }
+.act-nav-label {
+  min-width: 180px;
+  text-align: center;
+  color: var(--text);
+  font: 700 1rem var(--font-display);
+  letter-spacing: 0.01em;
+}
+
+/* Day view — big ring */
+.act-ring-wrap {
+  position: relative;
+  width: min(360px, 72vw);
+  aspect-ratio: 1;
+  margin: 0 auto var(--s4);
+}
+.act-ring { width: 100%; height: 100%; display: block; }
+.act-ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 16;
+}
+.act-ring-fill {
+  fill: none;
+  stroke: var(--lime);
+  stroke-width: 16;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 12px var(--lime-glow));
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.act-ring-fill.at-goal { stroke: var(--cyan); filter: drop-shadow(0 0 16px rgba(34,211,238,0.45)); }
+.act-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+.act-ring-label {
+  color: var(--cyan);
+  font: 600 0.95rem var(--font-body);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.act-ring-val {
+  font: 800 clamp(3rem, 9vw, 5rem) var(--font-display);
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  margin: 0.3rem 0 0.4rem;
+}
+.act-ring-sub {
+  color: var(--text-2);
+  font: 500 0.9rem var(--font-body);
+  display: flex;
+  gap: 0.3rem;
+}
+
+/* Stat tiles row */
+.act-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s2);
+  margin-bottom: var(--s4);
+}
+.act-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s2) var(--s3);
+  background: var(--ink-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition: border-color var(--t), background var(--t);
+}
+.act-stat:hover { border-color: var(--border-2); background: var(--ink-3); }
+.act-stat-icon {
+  width: 20px; height: 20px;
+  flex-shrink: 0;
+}
+.act-stat-icon.flame { color: #fb923c; }
+.act-stat-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.act-stat-val {
+  font: 700 1.25rem var(--font-display);
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.act-stat-label {
+  font: 500 0.75rem var(--font-body);
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.1rem;
+}
+
+/* Shared card for trend / bars / calendar */
+.act-card {
+  background: var(--ink-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s4);
+  margin-bottom: var(--s3);
+}
+.act-card .db-card-header { margin-bottom: var(--s2); }
+.act-card h3 { font: 700 1rem var(--font-display); color: var(--text); margin: 0; }
+
+/* Trend line */
+.act-trend {
+  display: block;
+  width: 100%;
+  height: 180px;
+}
+
+/* Week bars */
+.act-bars {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--s2);
+  align-items: end;
+  height: 240px;
+  padding-top: var(--s2);
+}
+.act-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s1);
+  height: 100%;
+}
+.act-bar-fill-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 42px;
+  height: 100%;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+.act-bar-fill {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: linear-gradient(180deg, var(--lime), rgba(163,230,53,0.45));
+  border-radius: var(--r-full);
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.act-bar.is-today .act-bar-fill-wrap {
+  box-shadow: 0 0 0 2px var(--cyan), 0 0 16px rgba(34,211,238,0.3);
+}
+.act-bar.is-empty .act-bar-fill { display: none; }
+.act-bar-val {
+  font: 600 0.72rem var(--font-display);
+  color: var(--text);
+  white-space: nowrap;
+}
+.act-bar.is-empty .act-bar-val { color: var(--text-3); }
+.act-bar-label {
+  font: 600 0.75rem var(--font-body);
+  color: var(--text-3);
+  text-transform: uppercase;
+}
+.act-bar.is-today .act-bar-label { color: var(--cyan); }
+
+.act-week-total {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font: 800 2rem var(--font-display);
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--s3);
+}
+.act-week-total span {
+  font: 500 0.9rem var(--font-body);
+  color: var(--text-2);
+  text-transform: lowercase;
+}
+
+/* Calendar */
+.act-cal-head {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--s1);
+  text-align: center;
+  font: 600 0.75rem var(--font-body);
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--s2);
+}
+.act-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--s1);
+}
+.act-cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: var(--text-3);
+  font: 600 0.9rem var(--font-body);
+  border-radius: var(--r-full);
+  cursor: pointer;
+  transition: background var(--t), color var(--t), border-color var(--t), transform var(--t);
+  padding: 0;
+}
+.act-cal-day.is-blank { visibility: hidden; pointer-events: none; }
+.act-cal-day.in-month { color: var(--text); }
+.act-cal-day:hover:not(.is-blank):not(.is-future) {
+  background: var(--ink-3);
+  border-color: var(--border-2);
+}
+.act-cal-day.has-workout {
+  background: var(--cyan);
+  color: var(--ink);
+}
+.act-cal-day.has-workout:hover { background: var(--lime); }
+.act-cal-day.has-workout::after {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: var(--ink);
+  border-radius: 50%;
+  opacity: 0.7;
+}
+.act-cal-day.is-today {
+  border-color: var(--cyan);
+}
+.act-cal-day.is-today.has-workout {
+  border-color: var(--lime);
+}
+.act-cal-day.is-future { opacity: 0.25; cursor: default; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .act-stats { grid-template-columns: repeat(2, 1fr); }
+  .act-nav-label { min-width: 140px; font-size: 0.9rem; }
+  .act-bars { height: 200px; }
+  .act-cal-day { font-size: 0.8rem; }
+}
+@media (max-width: 420px) {
+  .act-ring-val { font-size: 2.6rem; }
+  .act-bar-val { font-size: 0.65rem; }
+  .act-bar-label { font-size: 0.65rem; }
+}

@@ -258,6 +258,7 @@ const i18n = {
 
     // Dashboard nav
     'db.overview':   'Overview',
+    'db.activity':   'Activity',
     'db.programs':   'My Programs',
     'db.workouts':   'Workouts',
     'db.nutrition':  'Nutrition',
@@ -265,6 +266,30 @@ const i18n = {
     'db.body':       'Body Stats',
     'db.settings':   'Settings',
     'db.logout':     'Log Out',
+
+    // Activity panel
+    'db.activity.title': 'Activity',
+    'act.day':           'Day',
+    'act.week':          'Week',
+    'act.month':         'Month',
+    'act.today':         'Today',
+    'act.yesterday':     'Yesterday',
+    'act.this.week':     'This week',
+    'act.of':            'of',
+    'act.min':           'min',
+    'act.streak':        'Streak',
+    'act.kcal':          'kcal',
+    'act.sessions':      'Sessions',
+    'act.hours':         'h',
+    'act.active.days':   'Active days',
+    'act.trend.7d':      '7-day trend',
+    'cal.mon':           'M',
+    'cal.tue':           'T',
+    'cal.wed':           'W',
+    'cal.thu':           'T',
+    'cal.fri':           'F',
+    'cal.sat':           'S',
+    'cal.sun':           'S',
 
     // Overview
     'db.overview.title':  'Overview',
@@ -594,6 +619,7 @@ const i18n = {
 
     // Dashboard nav
     'db.overview':  'Yleiskatsaus',
+    'db.activity':  'Aktiviteetti',
     'db.programs':  'Omat Ohjelmat',
     'db.workouts':  'Harjoitukset',
     'db.nutrition': 'Ravinto',
@@ -601,6 +627,30 @@ const i18n = {
     'db.body':      'Kehon Tilastot',
     'db.settings':  'Asetukset',
     'db.logout':    'Kirjaudu Ulos',
+
+    // Activity panel
+    'db.activity.title': 'Aktiviteetti',
+    'act.day':           'Päivä',
+    'act.week':          'Viikko',
+    'act.month':         'Kuukausi',
+    'act.today':         'Tänään',
+    'act.yesterday':     'Eilen',
+    'act.this.week':     'Tällä viikolla',
+    'act.of':            '/',
+    'act.min':           'min',
+    'act.streak':        'Putki',
+    'act.kcal':          'kcal',
+    'act.sessions':      'Harjoitukset',
+    'act.hours':         't',
+    'act.active.days':   'Aktiiviset päivät',
+    'act.trend.7d':      '7 päivän trendi',
+    'cal.mon':           'M',
+    'cal.tue':           'T',
+    'cal.wed':           'K',
+    'cal.thu':           'T',
+    'cal.fri':           'P',
+    'cal.sat':           'L',
+    'cal.sun':           'S',
 
     // Overview
     'db.overview.title': 'Yleiskatsaus',
