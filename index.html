@@ -1232,8 +1232,8 @@
           <span class="form-error" id="login-pw-err" role="alert"></span>
         </div>
         <div class="form-forgot"><a href="#" class="auth-link" data-i18n="auth.forgot">Forgot password?</a></div>
-        <button type="submit" class="btn btn-primary w-full btn-auth-submit" id="login-submit" data-i18n="auth.login.btn">
-          <span class="btn-text">Log In</span>
+        <button type="submit" class="btn btn-primary w-full btn-auth-submit" id="login-submit">
+          <span class="btn-text" data-i18n="auth.login.btn">Log In</span>
           <span class="btn-spinner" style="display:none" aria-hidden="true"></span>
         </button>
         <p class="auth-error" id="login-error" role="alert"></p>
@@ -1292,12 +1292,12 @@
             <label class="goal-chip"><input type="radio" name="goal" value="mobility"/><span data-i18n="auth.goal.mobility">Mobility</span></label>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary w-full btn-auth-submit" id="signup-submit" data-i18n="auth.signup.btn">
-          <span class="btn-text">Create Account</span>
+        <button type="submit" class="btn btn-primary w-full btn-auth-submit" id="signup-submit">
+          <span class="btn-text" data-i18n="auth.signup.btn">Create Account</span>
           <span class="btn-spinner" style="display:none" aria-hidden="true"></span>
         </button>
         <p class="auth-error" id="signup-error" role="alert"></p>
-        <p class="auth-terms" data-i18n="auth.terms">By signing up you agree to our <a href="#" class="auth-link">Terms</a> and <a href="#" class="auth-link">Privacy Policy</a>.</p>
+        <p class="auth-terms"><span data-i18n="auth.terms.prefix">By signing up you agree to our </span><a href="#" class="auth-link" data-i18n="auth.terms.link1">Terms</a><span data-i18n="auth.terms.middle"> and </span><a href="#" class="auth-link" data-i18n="auth.terms.link2">Privacy Policy</a><span data-i18n="auth.terms.suffix">.</span></p>
       </form>
     </div>
 
