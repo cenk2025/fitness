@@ -715,7 +715,8 @@ h3 { font-size: clamp(1.3rem, 2.5vw, 1.75rem); font-weight: 700; }
 .program-body .program-img { background: radial-gradient(circle at 50% 80%, rgba(139,92,246,0.15), transparent 70%), var(--ink-3); }
 .program-mobility .program-img { background: radial-gradient(circle at 50% 80%, rgba(6,182,212,0.15), transparent 70%), var(--ink-3); }
 
-.program-illustration { width: 140px; height: 110px; }
+.program-illustration { width: 140px; height: 110px; display: flex; align-items: center; justify-content: center; }
+.program-illustration svg { width: 100%; height: 100%; display: block; }
 .program-level-badge {
   position: absolute;
   top: var(--s2); right: var(--s2);
