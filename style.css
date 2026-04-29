@@ -956,6 +956,122 @@ h3 { font-size: clamp(1.3rem, 2.5vw, 1.75rem); font-weight: 700; }
 .water-cup.filled::after { height: 100%; }
 .water-cup:hover { border-color: rgba(6,182,212,0.4); }
 
+/* ── Ravinto (Meal Plan Generator) ───────────────── */
+.ravinto-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
+  gap: var(--s5);
+  align-items: start;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.ravinto-form {
+  background: var(--ink-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s5);
+  box-shadow: var(--shadow-2);
+}
+.ravinto-form .form-group { margin-bottom: var(--s3); }
+.ravinto-form .btn { margin-top: var(--s2); }
+
+.ravinto-result {
+  background: var(--ink-2);
+  border: 1px solid var(--orange-border);
+  border-radius: var(--r-lg);
+  padding: var(--s5);
+  box-shadow: 0 8px 36px var(--orange-glow);
+  animation: ravintoFadeIn 0.4s ease;
+}
+@keyframes ravintoFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ravinto-result-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--s3);
+  color: var(--text);
+}
+.ravinto-target {
+  background: linear-gradient(135deg, var(--orange-soft), rgba(251,191,36,0.08));
+  border: 1px solid var(--orange-border);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+  margin-bottom: var(--s4);
+}
+.ravinto-target-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.2rem;
+  color: var(--orange);
+  line-height: 1;
+}
+.ravinto-target-lbl {
+  display: block;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+.ravinto-target-meta {
+  display: block;
+  margin-top: var(--s2);
+  font-size: 0.85rem;
+  color: var(--text-3);
+}
+.ravinto-meals {
+  display: grid;
+  gap: var(--s2);
+}
+.ravinto-meal {
+  background: var(--ink-3);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--r-sm);
+  padding: var(--s3);
+  transition: transform var(--t), border-color var(--t);
+}
+.ravinto-meal:hover {
+  transform: translateX(2px);
+  border-left-color: var(--amber);
+}
+.ravinto-meal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s2);
+  margin-bottom: 6px;
+}
+.ravinto-meal-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+.ravinto-meal-pro {
+  background: var(--orange);
+  color: #000;
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  border-radius: var(--r-full);
+  white-space: nowrap;
+}
+.ravinto-meal-body { color: var(--text-2); font-size: 0.95rem; line-height: 1.55; }
+.ravinto-tip {
+  margin-top: var(--s4);
+  padding: var(--s3);
+  background: var(--green-soft);
+  border: 1px solid var(--green-border);
+  border-radius: var(--r-sm);
+  font-size: 0.9rem;
+  color: var(--text-2);
+}
+.ravinto-tip strong { color: var(--green); }
+
 /* ── Progress ─────────────────────────────────────── */
 .progress-layout {
   display: grid;
@@ -1255,6 +1371,7 @@ h3 { font-size: clamp(1.3rem, 2.5vw, 1.75rem); font-weight: 700; }
 @media (max-width: 1100px) {
   .hero-visual { display: none; }
   .nutrition-layout { grid-template-columns: 1fr; }
+  .ravinto-layout { grid-template-columns: 1fr; }
   .progress-layout { grid-template-columns: 1fr; }
   .testimonials-grid { grid-template-columns: 1fr; }
   .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }

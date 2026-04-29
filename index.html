@@ -38,6 +38,7 @@
       <li><a href="#programs" class="nav-link" data-i18n="nav.programs">Programs</a></li>
       <li><a href="#workouts" class="nav-link" data-i18n="nav.workouts">Workouts</a></li>
       <li><a href="#nutrition" class="nav-link" data-i18n="nav.nutrition">Nutrition</a></li>
+      <li><a href="#ravinto" class="nav-link" data-i18n="nav.ravinto">Ravinto</a></li>
       <li><a href="#progress" class="nav-link" data-i18n="nav.progress">Progress</a></li>
       <li><a href="#pricing" class="nav-link" data-i18n="nav.pricing">Pricing</a></li>
     </ul>
@@ -75,6 +76,7 @@
     <a href="#programs" class="mobile-link" data-i18n="nav.programs">Programs</a>
     <a href="#workouts" class="mobile-link" data-i18n="nav.workouts">Workouts</a>
     <a href="#nutrition" class="mobile-link" data-i18n="nav.nutrition">Nutrition</a>
+    <a href="#ravinto" class="mobile-link" data-i18n="nav.ravinto">Ravinto</a>
     <a href="#progress" class="mobile-link" data-i18n="nav.progress">Progress</a>
     <a href="#pricing" class="mobile-link" data-i18n="nav.pricing">Pricing</a>
     <a href="#pricing" class="btn btn-primary w-full mt-s2" data-i18n="nav.cta">Start Free</a>
@@ -661,6 +663,74 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ RAVINTO (Meal Plan Generator) ══════════════════════════ -->
+<section class="section section-alt" id="ravinto" aria-label="Ravinto meal plan generator">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag" data-i18n="ravinto.tag">Ravinto · Meal Planner</span>
+      <h2 class="section-title">
+        <span data-i18n="ravinto.title.prefix">Personal</span>
+        <span class="text-gradient" data-i18n="ravinto.title.suffix">Protein Plan</span>
+      </h2>
+      <p class="section-sub" data-i18n="ravinto.sub">A protein-focused daily program tailored to your training level, body weight, diet and meal rhythm.</p>
+    </div>
+
+    <div class="ravinto-layout">
+      <form id="ravinto-form" class="ravinto-form" aria-label="Meal plan generator form">
+        <div class="form-group">
+          <label class="form-label" for="ravinto-taso" data-i18n="ravinto.f1">1. Training level</label>
+          <select id="ravinto-taso" name="taso" class="form-input form-select" required>
+            <option value="" data-i18n="ravinto.choose">-- Choose --</option>
+            <option value="aloittelija" data-i18n="ravinto.lvl.beg">Beginner</option>
+            <option value="keskitaso" data-i18n="ravinto.lvl.mid">Intermediate</option>
+            <option value="kokenut" data-i18n="ravinto.lvl.adv">Advanced</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ravinto-paino" data-i18n="ravinto.f2">2. Bodyweight (kg)</label>
+          <input id="ravinto-paino" name="paino" type="number" min="40" max="200" step="0.5"
+                 class="form-input" placeholder="e.g. 75" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ravinto-diet" data-i18n="ravinto.f3">3. Diet</label>
+          <select id="ravinto-diet" name="ruokavalio" class="form-input form-select" required>
+            <option value="" data-i18n="ravinto.choose">-- Choose --</option>
+            <option value="kaikki" data-i18n="ravinto.diet.all">Eat everything (meat, fish, dairy)</option>
+            <option value="ei-kala" data-i18n="ravinto.diet.nofish">Meat, but no fish</option>
+            <option value="kasvis" data-i18n="ravinto.diet.veg">Vegetarian (eggs + dairy ok)</option>
+            <option value="vegaani" data-i18n="ravinto.diet.vegan">Vegan</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ravinto-jauhe" data-i18n="ravinto.f4">4. Use protein powder?</label>
+          <select id="ravinto-jauhe" name="proteiinijauhe" class="form-input form-select" required>
+            <option value="" data-i18n="ravinto.choose">-- Choose --</option>
+            <option value="kylla" data-i18n="ravinto.yes">Yes</option>
+            <option value="ei" data-i18n="ravinto.no">No</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ravinto-ateriat" data-i18n="ravinto.f5">5. Meal rhythm</label>
+          <select id="ravinto-ateriat" name="ateriat" class="form-input form-select" required>
+            <option value="" data-i18n="ravinto.choose">-- Choose --</option>
+            <option value="2" data-i18n="ravinto.meals.a">A: 2 main meals</option>
+            <option value="3+2" data-i18n="ravinto.meals.b">B: 3 main meals + 2 snacks</option>
+            <option value="4" data-i18n="ravinto.meals.c">C: 4 meals</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg w-full" data-i18n="ravinto.cta">Build my plan</button>
+      </form>
+
+      <div id="ravinto-result" class="ravinto-result" hidden aria-live="polite"></div>
     </div>
   </div>
 </section>

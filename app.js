@@ -16,9 +16,35 @@ const i18n = {
     'nav.programs':  'Programs',
     'nav.workouts':  'Workouts',
     'nav.nutrition': 'Nutrition',
+    'nav.ravinto':   'Ravinto',
     'nav.progress':  'Progress',
     'nav.pricing':   'Pricing',
     'nav.cta':       'Start Free',
+
+    // Ravinto (Meal Plan Generator)
+    'ravinto.tag':           'Ravinto · Meal Planner',
+    'ravinto.title.prefix':  'Personal',
+    'ravinto.title.suffix':  'Protein Plan',
+    'ravinto.sub':           'A protein-focused daily program tailored to your training level, body weight, diet and meal rhythm.',
+    'ravinto.f1':            '1. Training level',
+    'ravinto.f2':            '2. Bodyweight (kg)',
+    'ravinto.f3':            '3. Diet',
+    'ravinto.f4':            '4. Use protein powder?',
+    'ravinto.f5':            '5. Meal rhythm',
+    'ravinto.choose':        '-- Choose --',
+    'ravinto.lvl.beg':       'Beginner',
+    'ravinto.lvl.mid':       'Intermediate',
+    'ravinto.lvl.adv':       'Advanced',
+    'ravinto.diet.all':      'Eat everything (meat, fish, dairy)',
+    'ravinto.diet.nofish':   'Meat, but no fish',
+    'ravinto.diet.veg':      'Vegetarian (eggs + dairy ok)',
+    'ravinto.diet.vegan':    'Vegan',
+    'ravinto.yes':           'Yes',
+    'ravinto.no':            'No',
+    'ravinto.meals.a':       'A: 2 main meals',
+    'ravinto.meals.b':       'B: 3 main meals + 2 snacks',
+    'ravinto.meals.c':       'C: 4 meals',
+    'ravinto.cta':           'Build my plan',
 
     // Hero
     'hero.badge':  '50,000+ Athletes Worldwide',
@@ -377,8 +403,34 @@ const i18n = {
     'nav.programs':  'Ohjelmat',
     'nav.workouts':  'Harjoitukset',
     'nav.nutrition': 'Ravinto',
+    'nav.ravinto':   'Ruokaohjelma',
     'nav.progress':  'Edistyminen',
     'nav.pricing':   'Hinnoittelu',
+
+    // Ravinto (Ruokaohjelman generaattori)
+    'ravinto.tag':           'Ravinto · Ruokaohjelma',
+    'ravinto.title.prefix':  'Henkilökohtainen',
+    'ravinto.title.suffix':  'Proteiiniohjelma',
+    'ravinto.sub':           'Proteiinipainotteinen päiväohjelma, joka mukautuu tasoosi, painoosi, ruokavalioosi ja ateriarytmiisi.',
+    'ravinto.f1':            '1. Taso',
+    'ravinto.f2':            '2. Paino (kg)',
+    'ravinto.f3':            '3. Ruokavalio',
+    'ravinto.f4':            '4. Käytätkö proteiinijauhetta?',
+    'ravinto.f5':            '5. Ateriarytmi',
+    'ravinto.choose':        '-- Valitse --',
+    'ravinto.lvl.beg':       'Aloittelija',
+    'ravinto.lvl.mid':       'Keskitaso',
+    'ravinto.lvl.adv':       'Kokenut',
+    'ravinto.diet.all':      'Syön kaikkea (liha, kala, maitotuotteet)',
+    'ravinto.diet.nofish':   'Syön lihaa, mutta en kalaa',
+    'ravinto.diet.veg':      'Kasvissyöjä (kananmuna + maitotuotteet ok)',
+    'ravinto.diet.vegan':    'Vegaani',
+    'ravinto.yes':           'Kyllä',
+    'ravinto.no':            'En',
+    'ravinto.meals.a':       'A: 2 pääateriaa',
+    'ravinto.meals.b':       'B: 3 pääateriaa + 2 välipalaa',
+    'ravinto.meals.c':       'C: 4 ateriaa',
+    'ravinto.cta':           'Luo ohjelmani',
     'nav.cta':       'Aloita Ilmaiseksi',
 
     // Hero
@@ -957,6 +1009,147 @@ document.querySelectorAll('.water-cup').forEach(cup => {
     }
   });
 });
+
+// ── Ravinto (Meal Plan Generator) ─────────────────
+(function initRavinto() {
+  const form = document.getElementById('ravinto-form');
+  const result = document.getElementById('ravinto-result');
+  if (!form || !result) return;
+
+  const proteiinit = {
+    'kaikki':  { aamu: 'Omelet (3 eggs) + cottage cheese 150 g',     lounas: 'Chicken breast 150 g',         illallinen: 'Salmon or beef 140 g' },
+    'ei-kala': { aamu: 'Omelet (3 eggs) + cottage cheese 150 g',     lounas: 'Chicken breast 150 g',         illallinen: 'Turkey or beef 140 g' },
+    'kasvis':  { aamu: 'Omelet (3 eggs) + Greek yogurt 200 g',       lounas: 'Cottage cheese 200 g + lentil stew', illallinen: 'Tofu 150 g + chickpeas' },
+    'vegaani': { aamu: 'Oat porridge + soy yogurt + walnuts',        lounas: 'Tempeh 150 g + quinoa',        illallinen: 'Tofu 200 g + lentils + bean salad' }
+  };
+  const proteiinitFi = {
+    'kaikki':  { aamu: 'Munakas (3 munaa) + raejuusto 150 g',        lounas: 'Kanafilee 150 g',              illallinen: 'Lohi tai naudanliha 140 g' },
+    'ei-kala': { aamu: 'Munakas (3 munaa) + raejuusto 150 g',        lounas: 'Kanafilee 150 g',              illallinen: 'Kalkkuna tai naudanliha 140 g' },
+    'kasvis':  { aamu: 'Munakas (3 munaa) + kreikkalainen jogurtti 200 g', lounas: 'Raejuusto 200 g + linssipata', illallinen: 'Tofu 150 g + kikherneet' },
+    'vegaani': { aamu: 'Kaurapuuro + soijajogurtti + saksanpähkinät', lounas: 'Tempeh 150 g + kvinoa',       illallinen: 'Tofu 200 g + linssit + papusalaatti' }
+  };
+  const kerroin = { aloittelija: 1.6, keskitaso: 1.8, kokenut: 2.0 };
+  const tasoLabel = {
+    en: { aloittelija: 'Beginner',    keskitaso: 'Intermediate', kokenut: 'Advanced' },
+    fi: { aloittelija: 'Aloittelija', keskitaso: 'Keskitaso',    kokenut: 'Kokenut'  }
+  };
+
+  const T = {
+    en: {
+      title: 'Your daily plan',
+      target: 'Daily protein target',
+      level: 'level',
+      meal_a1: 'Meal 1 (~12:00)',  meal_a2: 'Meal 2 (~19:00)',
+      meal_b1: 'Breakfast', meal_b2: 'Snack 1', meal_b3: 'Lunch', meal_b4: 'Snack 2', meal_b5: 'Dinner',
+      meal_c1: 'Breakfast', meal_c2: 'Lunch',   meal_c3: 'Snack', meal_c4: 'Dinner',
+      shake:        'Protein shake',
+      shake_full:   '1 scoop whey protein + milk',
+      shake_banana: 'Protein shake + banana',
+      shake_oats:   'Protein shake + oat flakes',
+      a1_extra: ' + brown rice + salad',
+      a2_extra: ' + sweet potato + roasted vegetables',
+      b1: '',
+      b2_alt: 'Cottage cheese 150 g + nuts',
+      b3_extra: ' + bulgur + salad',
+      b4: 'Greek yogurt 200 g + berries',
+      b5_extra: ' + quinoa + vegetables',
+      c1: '',
+      c2_extra: ' + brown rice + salad',
+      c3_alt: 'Cottage cheese 200 g + nuts',
+      c4_extra: ' + sweet potato + roasted vegetables',
+      tip_label: 'Tip:',
+      tip: 'Drink at least 2.5–3 L of water per day. Adjust portion sizes so you reach %P g of protein.'
+    },
+    fi: {
+      title: 'Päiväohjelmasi',
+      target: 'Päivittäinen proteiinitavoite',
+      level: 'taso',
+      meal_a1: 'Ateria 1 (n. klo 12)', meal_a2: 'Ateria 2 (n. klo 19)',
+      meal_b1: 'Aamiainen', meal_b2: 'Välipala 1', meal_b3: 'Lounas', meal_b4: 'Välipala 2', meal_b5: 'Illallinen',
+      meal_c1: 'Aamiainen', meal_c2: 'Lounas',     meal_c3: 'Välipala', meal_c4: 'Illallinen',
+      shake:        'Proteiinipirtelö',
+      shake_full:   '1 mittalusikallinen heraproteiinia + maito',
+      shake_banana: 'Proteiinipirtelö + banaani',
+      shake_oats:   'Proteiinipirtelö + kaurahiutaleita',
+      a1_extra: ' + täysjyväriisi + salaatti',
+      a2_extra: ' + bataatti + uunivihannekset',
+      b2_alt: 'Raejuusto 150 g + pähkinöitä',
+      b3_extra: ' + bulguri + salaatti',
+      b4: 'Kreikkalainen jogurtti 200 g + marjat',
+      b5_extra: ' + kvinoa + vihannekset',
+      c2_extra: ' + täysjyväriisi + salaatti',
+      c3_alt: 'Raejuusto 200 g + pähkinöitä',
+      c4_extra: ' + bataatti + uunivihannekset',
+      tip_label: 'Vinkki:',
+      tip: 'Juo vähintään 2,5–3 litraa vettä päivässä. Säädä annoskokoja tarpeen mukaan, jotta saavutat %P g proteiinia.'
+    }
+  };
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const paino = parseFloat(data.get('paino'));
+    const taso = data.get('taso');
+    const ruokavalio = data.get('ruokavalio');
+    const jauhe = data.get('proteiinijauhe') === 'kylla';
+    const ateriat = data.get('ateriat');
+
+    if (!paino || !taso || !ruokavalio || !ateriat) return;
+
+    const lang = (typeof currentLang !== 'undefined' ? currentLang : 'en');
+    const t = T[lang] || T.en;
+    const proteiiniTavoite = Math.round(paino * kerroin[taso]);
+    const p = (lang === 'fi' ? proteiinitFi : proteiinit)[ruokavalio];
+
+    const meals = [];
+    if (ateriat === '2') {
+      meals.push({ n: t.meal_a1, b: p.lounas + t.a1_extra,    g: '~50 g' });
+      meals.push({ n: t.meal_a2, b: p.illallinen + t.a2_extra, g: '~45 g' });
+      if (jauhe) meals.push({ n: t.shake, b: t.shake_full, g: '~25 g' });
+    } else if (ateriat === '3+2') {
+      meals.push({ n: t.meal_b1, b: p.aamu, g: '~35 g' });
+      meals.push({ n: t.meal_b2, b: jauhe ? t.shake_banana : t.b2_alt, g: '~25 g' });
+      meals.push({ n: t.meal_b3, b: p.lounas + t.b3_extra, g: '~45 g' });
+      meals.push({ n: t.meal_b4, b: t.b4, g: '~20 g' });
+      meals.push({ n: t.meal_b5, b: p.illallinen + t.b5_extra, g: '~40 g' });
+    } else if (ateriat === '4') {
+      meals.push({ n: t.meal_c1, b: p.aamu, g: '~35 g' });
+      meals.push({ n: t.meal_c2, b: p.lounas + t.c2_extra, g: '~45 g' });
+      meals.push({ n: t.meal_c3, b: jauhe ? t.shake_oats : t.c3_alt, g: '~30 g' });
+      meals.push({ n: t.meal_c4, b: p.illallinen + t.c4_extra, g: '~40 g' });
+    }
+
+    const tasoTxt = (tasoLabel[lang] || tasoLabel.en)[taso];
+    const mealsHtml = meals.map(m => `
+      <div class="ravinto-meal">
+        <div class="ravinto-meal-head">
+          <span class="ravinto-meal-name">${escapeHtml(m.n)}</span>
+          <span class="ravinto-meal-pro">${escapeHtml(m.g)}</span>
+        </div>
+        <div class="ravinto-meal-body">${escapeHtml(m.b)}</div>
+      </div>
+    `).join('');
+
+    result.innerHTML = `
+      <h3 class="ravinto-result-title">${escapeHtml(t.title)}</h3>
+      <div class="ravinto-target">
+        <span class="ravinto-target-num">${proteiiniTavoite} g</span>
+        <span class="ravinto-target-lbl">${escapeHtml(t.target)}</span>
+        <span class="ravinto-target-meta">${paino} kg × ${kerroin[taso]} g/kg · ${escapeHtml(t.level)}: ${escapeHtml(tasoTxt)}</span>
+      </div>
+      <div class="ravinto-meals">${mealsHtml}</div>
+      <div class="ravinto-tip"><strong>${escapeHtml(t.tip_label)}</strong> ${escapeHtml(t.tip.replace('%P', proteiiniTavoite))}</div>
+    `;
+    result.hidden = false;
+    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+})();
 
 // ── Init ──────────────────────────────────────────
 applyLang(currentLang);
